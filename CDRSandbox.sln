@@ -1,0 +1,33 @@
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CDRSandbox", "CDRSandbox\CDRSandbox.csproj", "{53D48D89-9AE1-4388-9C24-526C02C1D35C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{7957F347-9044-45DC-9539-6AE5EE3CA1E0}"
+	ProjectSection(SolutionItems) = preProject
+		docker-compose.yml = docker-compose.yml
+		.env = .env
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DockerConfigs", "DockerConfigs", "{ACCD0F58-34E2-4073-AB8B-C1502E696ABD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "clickhouse", "clickhouse", "{494792D9-6711-4336-9102-B5A23F7F32B5}"
+	ProjectSection(SolutionItems) = preProject
+		DockerConfigs\clickhouse\config.xml = DockerConfigs\clickhouse\config.xml
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{53D48D89-9AE1-4388-9C24-526C02C1D35C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{53D48D89-9AE1-4388-9C24-526C02C1D35C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{53D48D89-9AE1-4388-9C24-526C02C1D35C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{53D48D89-9AE1-4388-9C24-526C02C1D35C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{ACCD0F58-34E2-4073-AB8B-C1502E696ABD} = {7957F347-9044-45DC-9539-6AE5EE3CA1E0}
+		{494792D9-6711-4336-9102-B5A23F7F32B5} = {ACCD0F58-34E2-4073-AB8B-C1502E696ABD}
+	EndGlobalSection
+EndGlobal
