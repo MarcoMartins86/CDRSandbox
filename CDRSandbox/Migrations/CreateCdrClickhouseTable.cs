@@ -41,9 +41,9 @@ public class CreateCdrClickhouseTable : Migration
                  type Nullable(Enum8('domestic' = 1, 'international' = 2))
              )
              ENGINE = MergeTree
-             PARTITION BY call_date
-             PRIMARY KEY (caller_id, recipient)
-             ORDER BY (caller_id, recipient, call_date)
+             PARTITION BY toYYYYMM(call_date)
+             PRIMARY KEY (type, caller_id, recipient)
+             ORDER BY (type, caller_id, recipient, call_date)
              """
         );
     }
