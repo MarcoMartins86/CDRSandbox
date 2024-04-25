@@ -1,0 +1,29 @@
+﻿services:
+  cdrsandbox:
+    depends_on:
+      clickhouse:
+        condition: service_healthy
+    image: cdrsandbox
+    build:
+      context: .
+      dockerfile: CDRSandbox/Dockerfile
+    ports:
+      - "${CDRSANDBOX_HTTP_PORT}:8080"
+  
+  clickhouse:
+    image: clickhouse/clickhouse-server:${CLICKHOUSE_VERSION}
+    ports:
+      - "${CLICKHOUSE_PORT}:8123" # ODBC and JDBC and HTTP
+      - "${CLICKHOUSE_NATIVE_PORT}:9000" # native clickhouse protocol
+      - "${CLICKHOUSE_MYSQL_PORT}:9004" # MySQL interface
+      - "${CLICKHOUSE_POSTGRES_PORT}:9005" # PostgreSQL interface
+    environment: # taken from https://hub.docker.com/r/clickhouse/clickhouse-server/
+      CLICKHOUSE_DB: ${CLICKHOUSE_DB}
+      CLICKHOUSE_USER: ${CLICKHOUSE_USER}
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD}
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: ${CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT}
+    ulimits:
+      nofile: 262144 # increase file descriptors
+    volumes:
+      - ./DockerConfigs/clickhouse/config.xml:/etc/clickhouse-server/config.xml
+    #healthcheck:
