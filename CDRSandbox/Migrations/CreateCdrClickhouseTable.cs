@@ -36,7 +36,8 @@ public class CreateCdrClickhouseTable : Migration
                  end_time FixedString(8),
                  duration UInt32,
                  cost Float32,
-                 reference FixedString(35),
+                 reference FixedString(17),
+                 currency FixedString(3),
                  type Nullable(Enum8('domestic' = 1, 'international' = 2))
              )
              ENGINE = MergeTree
