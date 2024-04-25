@@ -1,0 +1,7 @@
+@CDRSandbox_HostAddress = http://localhost:7778
+
+GET {{CDRSandbox_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
+
