@@ -1391,11 +1391,9 @@
     </distributed_ddl>
 
     <!-- Settings to fine-tune MergeTree tables. See documentation in source code, in MergeTreeSettings.h -->
-    <!--
     <merge_tree>
-        <max_suspicious_broken_parts>5</max_suspicious_broken_parts>
+        <allow_nullable_key>1</allow_nullable_key>
     </merge_tree>
-    -->
 
     <!-- Settings to fine-tune ReplicatedMergeTree tables. See documentation in source code, in MergeTreeSettings.h -->
     <!--
