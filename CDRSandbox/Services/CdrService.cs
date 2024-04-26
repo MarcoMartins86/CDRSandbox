@@ -15,7 +15,7 @@ public class CdrService(ICdrRepository repository)
         // Add our converter of byte[] to pad the data if needed
         csv.Context.TypeConverterCache.AddConverter<byte[]>(new PaddedByteArrayConverterHelper());
         // Get the items in a lazy way (they will only be evaluated when needed)
-        var items = csv.GetRecordsAsync<CdrItem>().ToBlockingEnumerable();
+        var items = csv.GetRecordsAsync<CdrCsvItem>().ToBlockingEnumerable();
         // Call our CDR repository to save them
         return await repository.Store(items);
     }

@@ -17,7 +17,7 @@ public class CdrRepositoryClickhouseImpl(IOptions<DbOptionsClickhouse> options) 
         // TODO release managed resources here
     }
 
-    public async Task<long> Store(IEnumerable<CdrItem> items)
+    public async Task<long> Store(IEnumerable<CdrCsvItem> items)
     {
         using var bulkCopy = new ClickHouseBulkCopy(options.Value.ConnectionString)
         {

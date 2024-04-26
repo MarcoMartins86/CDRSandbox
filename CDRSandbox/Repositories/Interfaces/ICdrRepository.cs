@@ -4,5 +4,5 @@ namespace CDRSandbox.Repositories.Interfaces;
 
 public interface ICdrRepository
 {
-    public Task<long> Store(IEnumerable<CdrItem> items);
+    public Task<long> Store(IEnumerable<CdrCsvItem> items);
 }

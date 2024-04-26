@@ -4,6 +4,7 @@
 * CSV files always contains the header with the columns name, although it can omit some of them.
 * CSV files are in UTF-8.
 * CSV separator is `,`.
+* On the specs it states that the currency is in ISO alpha-3 format, but this does not make any sense since this is for country codes. Most likely it was an overlook so, I'm using ISO 4217 for the currency.
 * CSV `caller_id` is at most 32 chars and always present. Can be empty string.
 * CSV `recipient` is at most 32 chars and always present. Can be empty string.
 * CSV `call_date` is in format dd/MM/yyyy, d/MM/yyyy or dd/M/yyyy and always present.
@@ -11,7 +12,10 @@
 * CSV `duration` is an unsigned integer and always present.
 * CSV `cost` is a positive floating point and always present.
 * CSV `reference` is a string with hexadecimal representation of a binary of at most 17 bytes, unique in all data sets and always present.
+* CSV `currency` is a ISO 4217 3 letter string, and one of ["AUD", "EUR", "CNY", "GBP", "JPY", "USD"]. 
 * CSV `type` can be null, 1 or 2, because on sample data it does not exist and in specs mention that can be 1 or 2.
+
+* As for cu
 
 ## Technology Decisions
 
@@ -51,4 +55,9 @@ It's not the fastest way, but it is the one that consumes less resources.
 
 ### 6. Using CsvHelper library to parse the CDR file
 Why reinvent the wheel? This library looks like it is well maintained and performant and does what we need.
+
+### 7. ClickHouse.Client library to handle Clickhouse data communication
+This library is a ADO.NET client for ClickHouse and at first glance, seems to be the best one out there.
+The bulk insertion seems to be very well implemented.
+
 
