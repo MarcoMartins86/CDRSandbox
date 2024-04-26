@@ -2,7 +2,7 @@
 using NSwag.Generation.Processors;
 using NSwag.Generation.Processors.Contexts;
 
-namespace CDRSandbox.OpenApi;
+namespace CDRSandbox.Attributes.OpenApi;
 
 public class ForceResponseContentTypeAttribute(int statusCode, string contentType)
     : OpenApiOperationProcessorAttribute(typeof(ForceResponseContentTypeOperationProcessor), statusCode, contentType)

@@ -1,5 +1,18 @@
 # CDRSandbox
 
+## Assumptions
+* CSV files always contains the header with the columns name, although it can omit some of them.
+* CSV files are in UTF-8.
+* CSV separator is `,`.
+* CSV `caller_id` is at most 32 chars and always present. Can be empty string.
+* CSV `recipient` is at most 32 chars and always present. Can be empty string.
+* CSV `call_date` is in format dd/MM/yyyy, d/MM/yyyy or dd/M/yyyy and always present.
+* CSV `end_time` is in format hh:mm:ss and always present.
+* CSV `duration` is an unsigned integer and always present.
+* CSV `cost` is a positive floating point and always present.
+* CSV `reference` is a string with hexadecimal representation of a binary of at most 17 bytes, unique in all data sets and always present.
+* CSV `type` can be null, 1 or 2, because on sample data it does not exist and in specs mention that can be 1 or 2.
+
 ## Technology Decisions
 
 ### 1. AspNet Core Web API Project
@@ -35,4 +48,7 @@ To facilitate running with the external dependencies (Clickhouse).
 ### 5. Receive files as a stream when uploaded
 Microsoft states that files could be buffered or streamed and says that for larger files the stream should be used https://learn.microsoft.com/en-us/aspnet/core/mvc/models/file-uploads?view=aspnetcore-8.0.
 It's not the fastest way, but it is the one that consumes less resources.
+
+### 6. Using CsvHelper library to parse the CDR file
+Why reinvent the wheel? This library looks like it is well maintained and performant and does what we need.
 

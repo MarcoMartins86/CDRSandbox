@@ -4,7 +4,7 @@ using NSwag.Annotations;
 using NSwag.Generation.Processors;
 using NSwag.Generation.Processors.Contexts;
 
-namespace CDRSandbox.OpenApi;
+namespace CDRSandbox.Attributes.OpenApi;
 
 public class ConsumesLargeFileAttribute(string description = "")
     : OpenApiOperationProcessorAttribute(typeof(ConsumesLargeFileOperationProcessor), description)

@@ -9,6 +9,7 @@
 
     <ItemGroup>
         <PackageReference Include="ClickHouse.Client" Version="7.4.0" />
+        <PackageReference Include="CsvHelper" Version="32.0.0" />
         <PackageReference Include="FluentMigrator" Version="5.2.0" />
         <PackageReference Include="FluentMigrator.Runner" Version="5.2.0" />
         <PackageReference Include="FluentMigrator.Runner.SQLite" Version="5.2.0" />

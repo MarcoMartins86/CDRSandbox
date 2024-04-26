@@ -7,15 +7,8 @@ using Microsoft.Extensions.Options;
 namespace CDRSandbox.Migrations;
 
 [Migration(202404251107)]
-public class CreateCdrClickhouseTable : Migration
+public class CreateCdrClickhouseTable(IOptions<DbOptionsClickhouse> options) : Migration
 {
-    private IOptions<DbOptionsClickhouse> _options;
-    
-    public CreateCdrClickhouseTable(IOptions<DbOptionsClickhouse> options)
-    {
-        _options = options;
-    }
-    
     public override void Down()
     {
         throw new NotImplementedException();
@@ -23,11 +16,11 @@ public class CreateCdrClickhouseTable : Migration
 
     public override void Up()
     {
-        using var connection = new ClickHouseConnection(_options.Value.ConnectionString);
+        using var connection = new ClickHouseConnection(options.Value.ConnectionString);
 
         connection.ExecuteStatementAsync(
             $"""
-             CREATE OR REPLACE TABLE {_options.Value.Database}.{CdrRepositoryClickhouseImpl.TableName}
+             CREATE OR REPLACE TABLE {options.Value.Database}.{CdrRepositoryClickhouseImpl.TableName}
              (
                  caller_id FixedString(32),
                  recipient FixedString(32),
