@@ -21,13 +21,18 @@ Table data types selected:
 - end_time: `FixedString(8)` decided to store it as a string and will not use this field in period computation to simplify the logic and keep queries faster. Also, the requirements don't mention that the period must consider this time.
 - duration: `UInt32` decided to use UInt32 since UInt16 was only able to store near 18h of call duration in seconds and there could be a corner case where it was bigger than that.
 - cost: `Float32` since it's a floating point value with 3 decimal places.
-- reference: `FixedString(17)` FixedString can also be used for a binary representation of hashes, this one seems to have 132 bits (not UUID 128 bits) and so, 132/8=16.5=17.
+- reference: `FixedString(17)` FixedString can also be used for a binary representation of hashes, this one seems to have 132 bits (not UUID 128 bits) and so, 132/8=16.5=17. Also, make an assumption that datasets are correct and that they are all unique.
 - currency: `FixedString(3)` it's always 3 chars.
 - type: `Nullable(Enum8('domestic' = 1, 'international' = 2))` in the specification it states only two types but it can be null, at least there's values in the sample data.
 
 ### 3. FluentMigrator
 This one was chosen thinking more in future work, to ease the maintainability of the database (automatic versioned migrations), and also because no one likes to run SQL scripts by hand.
+Although, it's not fully compatible with Clickhouse, I'm using a SQLite to keep tracking of the migrations changes.
 
 ### 4. Docker containers
 To facilitate running with the external dependencies (Clickhouse).
+
+### 5. Receive files as a stream when uploaded
+Microsoft states that files could be buffered or streamed and says that for larger files the stream should be used https://learn.microsoft.com/en-us/aspnet/core/mvc/models/file-uploads?view=aspnetcore-8.0.
+It's not the fastest way, but it is the one that consumes less resources.
 

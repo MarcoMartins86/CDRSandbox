@@ -1,17 +1,13 @@
-using System.Reflection;
 using CDRSandbox.Extensions;
-using CDRSandbox.Repositories;
 using CDRSandbox.Repositories.Clickhouse;
 using CDRSandbox.Repositories.Interfaces;
-using FluentMigrator.Runner;
-using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Logging configuration
 #region Logging
 
-builder.Logging.AddFluentMigratorConsole();
+builder.Logging.AddMigrateDbLogging();
 
 #endregion
 
@@ -19,12 +15,7 @@ builder.Logging.AddFluentMigratorConsole();
 #region Services 
 
 // Db Migration
-builder.Services
-    .AddFluentMigratorCore()
-    .ConfigureRunner(config => config
-        .AddSQLite(true, true)
-        .WithGlobalConnectionString("Data Source=:memory:")
-        .WithMigrationsIn(Assembly.GetExecutingAssembly()));
+builder.Services.AddMigrateDbConfigs();
 
 // Db Abstractions initialization
 builder.Services.AddOptions<DbOptionsClickhouse>().BindConfiguration("ConnectionStrings").ValidateDataAnnotations().ValidateOnStart();
@@ -32,10 +23,10 @@ builder.Services.AddScoped<ICdrRepository, CdrRepositoryClickhouseImpl>();
 
 // Web API
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 
+// OpenAPI
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddOpenApiConfigs();
 
 #endregion
 
@@ -53,8 +44,7 @@ if (app.Environment.IsDevelopment())
     
 }
 
-app.UseSwagger();
-app.UseSwaggerUI();
+app.UseOpenApiAndReDoc();
 
 app.UseAuthorization();
 

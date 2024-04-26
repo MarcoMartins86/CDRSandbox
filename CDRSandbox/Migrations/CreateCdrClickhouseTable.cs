@@ -1,5 +1,4 @@
-﻿using System.Data;
-using CDRSandbox.Repositories.Clickhouse;
+﻿using CDRSandbox.Repositories.Clickhouse;
 using ClickHouse.Client.ADO;
 using ClickHouse.Client.Utility;
 using FluentMigrator;
@@ -28,7 +27,7 @@ public class CreateCdrClickhouseTable : Migration
 
         connection.ExecuteStatementAsync(
             $"""
-             CREATE TABLE IF NOT EXISTS {_options.Value.Database}.{CdrRepositoryClickhouseImpl.TableName}
+             CREATE OR REPLACE TABLE {_options.Value.Database}.{CdrRepositoryClickhouseImpl.TableName}
              (
                  caller_id FixedString(32),
                  recipient FixedString(32),
