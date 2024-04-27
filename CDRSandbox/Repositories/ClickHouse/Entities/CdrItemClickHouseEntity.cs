@@ -1,43 +1,17 @@
-﻿using CDRSandbox.Helpers;
-using CDRSandbox.Repositories.Interfaces;
+﻿using CDRSandbox.Repositories.Interfaces;
 
 namespace CDRSandbox.Repositories.ClickHouse.Entities;
 
 public class CdrItemClickHouseEntity : ICdrItemEntity
 {
-    private string _callerID;
-    public string CallerId
-    {
-        get => _callerID;
-        set => _callerID = ClickHouseHelper.UnpadFixedString(value);
-    }
-
-    private string _recipient;
-    public string Recipient 
-    {
-        get => _recipient;
-        set => _recipient = ClickHouseHelper.UnpadFixedString(value);
-    }
-
-    // Although ClickHouse contains type Date, it reaches here at DateTime so let's use it
-    private DateTime _callDate;
-    public DateTime CallDate
-    {
-        get => _callDate.Date;
-        set => _callDate = value;
-    }
-    
+    public string CallerId { get; set; }
+    public string Recipient { get; set; }
+    // Although ClickHouse column is type Date, it reaches here at DateTime so let's use it
+    public DateTime CallDate { get; set; }
     public string EndTime { get; set; }
     public uint Duration { get; set; }
     public float Cost { get; set; }
-    
-    private string _reference;
-    public string Reference 
-    {
-        get => _reference;
-        set => _reference = ClickHouseHelper.UnpadFixedString(value);
-    }
-    
+    public string Reference { get; set; }
     public string Currency { get; set; }
     public int? Type { get; set; } 
     

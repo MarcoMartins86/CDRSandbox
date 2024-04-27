@@ -26,4 +26,8 @@
       nofile: 262144 # increase file descriptors
     volumes:
       - ./DockerConfigs/clickhouse/config.xml:/etc/clickhouse-server/config.xml
-    #healthcheck:
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider localhost:8123/ping || exit 1
+      interval: 5s
+      timeout: 5s
+      retries: 5
