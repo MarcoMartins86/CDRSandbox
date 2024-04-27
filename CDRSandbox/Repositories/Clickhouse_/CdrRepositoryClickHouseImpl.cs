@@ -7,7 +7,7 @@ using Microsoft.Extensions.Options;
 
 namespace CDRSandbox.Repositories.Clickhouse;
 
-public class CdrRepositoryClickhouseImpl(IOptions<DbOptionsClickhouse> options) : ICdrRepository, IDisposable
+public class CdrRepositoryClickHouseImpl(IOptions<DbOptionsClickHouse> options) : ICdrRepository, IDisposable
 {
     private const string CallerIdColumn = "caller_id";
     private const string RecipientColumn = "recipient";

@@ -25,8 +25,8 @@ builder.Logging.AddMigrateDbLogging();
 builder.Services.AddMigrateDbConfigs();
 
 // Db Abstractions initialization
-builder.Services.AddOptions<DbOptionsClickhouse>().BindConfiguration("ConnectionStrings").ValidateDataAnnotations().ValidateOnStart();
-builder.Services.AddScoped<ICdrRepository, CdrRepositoryClickhouseImpl>();
+builder.Services.AddOptions<DbOptionsClickHouse>().BindConfiguration("ConnectionStrings").ValidateDataAnnotations().ValidateOnStart();
+builder.Services.AddScoped<ICdrRepository, CdrRepositoryClickHouseImpl>();
 
 // Our Services
 builder.Services.AddScoped<CdrService>(); // Scoped because ICdrRepository TODO: if ICdrRepository can be singleton change this

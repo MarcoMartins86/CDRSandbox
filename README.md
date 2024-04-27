@@ -27,13 +27,13 @@ Controllers -> Services -> Repositories
 ### Repository pattern
 So we can use multiple different repositories or just to exchange to another in the future.
 
-### Clickhouse for database
+### ClickHouse for database
 Since datasets can be huge (GB), certainly it would bring relational databases (RDBMS) like SQL Server, PostgreSQL, and the like to their knees since they are row oriented. 
 And so, I went with another approach more appropriate for this kind of data.
 
-Clickhouse is a high-performance, column-oriented SQL database management system (DBMS) for online analytical processing (OLAP).
+ClickHouse is a high-performance, column-oriented SQL database management system (DBMS) for online analytical processing (OLAP).
 It states that it can handle trillions of rows in and query results in near real-time.
-However, Clickhouse has at least one drawback, it can't handle data updates easily. 
+However, ClickHouse has at least one drawback, it can't handle data updates easily. 
 Nevertheless, given that our datasets are immutable that scenario will not affect us.
 
 Table data types selected:
@@ -49,10 +49,10 @@ Table data types selected:
 
 ### FluentMigrator
 This one was chosen thinking more in future work, to ease the maintainability of the database (automatic versioned migrations), and also because no one likes to run SQL scripts by hand.
-Although, it's not fully compatible with Clickhouse, I'm using a SQLite to keep tracking of the migrations changes.
+Although, it's not fully compatible with ClickHouse, I'm using a SQLite to keep tracking of the migrations changes.
 
 ### Docker containers
-To facilitate running with the external dependencies (Clickhouse).
+To facilitate running with the external dependencies (ClickHouse).
 
 ### Receive files as a stream when uploaded
 Microsoft states that files could be buffered or streamed and says that for larger files the stream should be used https://learn.microsoft.com/en-us/aspnet/core/mvc/models/file-uploads?view=aspnetcore-8.0.
@@ -61,7 +61,7 @@ It's not the fastest way, but it is the one that consumes less resources.
 ### Using CsvHelper library to parse the CDR file
 Why reinvent the wheel? This library looks like it is well maintained and performant and does what we need.
 
-### ClickHouse.Client with Dapper libraries to handle Clickhouse data communication
+### ClickHouse.Client with Dapper libraries to handle ClickHouse data communication
 ClickHouse.Client library is a ADO.NET client for ClickHouse and at first glance, seems to be the best one out there.
 The bulk insertion seems to be very well implemented.
 Dapper helps out when fetching query results and convert them to objects.

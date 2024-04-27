@@ -7,7 +7,7 @@ using Microsoft.Extensions.Options;
 namespace CDRSandbox.Migrations;
 
 [Migration(202404251107)]
-public class CreateCdrClickhouseTable(IOptions<DbOptionsClickhouse> options) : Migration
+public class CreateCdrClickHouseTable(IOptions<DbOptionsClickHouse> options) : Migration
 {
     public override void Down()
     {
@@ -20,7 +20,7 @@ public class CreateCdrClickhouseTable(IOptions<DbOptionsClickhouse> options) : M
 
         await connection.ExecuteStatementAsync(
             $"""
-             CREATE OR REPLACE TABLE {options.Value.Database}.{CdrRepositoryClickhouseImpl.TableName}
+             CREATE OR REPLACE TABLE {options.Value.Database}.{CdrRepositoryClickHouseImpl.TableName}
              (
                  caller_id FixedString(32),
                  recipient FixedString(32),

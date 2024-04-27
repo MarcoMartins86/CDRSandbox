@@ -2,9 +2,9 @@
 
 namespace CDRSandbox.Repositories.Clickhouse;
 
-public class DbOptionsClickhouse
+public class DbOptionsClickHouse
 {
-    [ConfigurationKeyName("Clickhouse")]
+    [ConfigurationKeyName("ClickHouse")]
     [RegularExpression("^[a-zA-Z0-9=.;]+$")]
     [Required]
     public string? ConnectionString { get; set; }
