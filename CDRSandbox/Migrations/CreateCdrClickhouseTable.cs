@@ -14,11 +14,11 @@ public class CreateCdrClickhouseTable(IOptions<DbOptionsClickhouse> options) : M
         throw new NotImplementedException();
     }
 
-    public override void Up()
+    public override async void Up()
     {
-        using var connection = new ClickHouseConnection(options.Value.ConnectionString);
+        await using var connection = new ClickHouseConnection(options.Value.ConnectionString);
 
-        connection.ExecuteStatementAsync(
+        await connection.ExecuteStatementAsync(
             $"""
              CREATE OR REPLACE TABLE {options.Value.Database}.{CdrRepositoryClickhouseImpl.TableName}
              (
@@ -28,7 +28,7 @@ public class CreateCdrClickhouseTable(IOptions<DbOptionsClickhouse> options) : M
                  end_time FixedString(8),
                  duration UInt32,
                  cost Float32,
-                 reference FixedString(17),
+                 reference FixedString(33),
                  currency FixedString(3),
                  type Nullable(Enum8('domestic' = 1, 'international' = 2))
              )

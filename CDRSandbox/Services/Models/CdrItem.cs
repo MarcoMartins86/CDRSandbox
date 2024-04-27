@@ -1,33 +1,35 @@
-﻿using CDRSandbox.Services.Models.ValueObjects;
+﻿using CDRSandbox.Repositories.Interfaces;
+using CDRSandbox.Services.Models.ValueObjects;
 
 namespace CDRSandbox.Services.Models;
 
 public class CdrItem
 {
-    //[Name("caller_id")]
+    public const string CallDateFormat = "dd/MM/yyyy";
+    public const string EndTimeFormat = "HH:mm:ss";
+    public const string ReferencePattern = "^[0-9a-fA-F]{1,33}$";
+    
     public Phone CallerId { get; set; }
-    
-    //[Name("recipient")]
     public Phone Recipient { get; set; }
-    
-    //[Name("call_date")]
-    //[Format(["dd/MM/yyyy", "dd/M/yyyy", "d/MM/yyyy"])]
-    public DateOnly CallDate { get; set; }
-    
-    //[Name("end_time")]
-    public TimeOnly EndTime { get; set; }
-    
-    //[Name("duration")]
-    public TimeSpan Duration { get; set; }
-    
-    //[Name("cost")]
+    public Date CallDate { get; set; }
+    public Time EndTime { get; set; }
+    public Span Duration { get; set; }
     public Money Cost { get; set; }
-    
-    //[Name("reference")]
     public CdrReference Reference { get; set; }
-    
-    //[Optional]
-    //[Name("type")]
     public CdrCallTypeEnum? Type { get; set; }
 
+    public static CdrItem? From(ICdrItemEntity? entity)
+    {
+        return entity != null ? new CdrItem()
+        {
+            CallerId = new Phone(entity.CallerId),
+            Recipient = new Phone(entity.Recipient),
+            CallDate = new Date(entity.CallDate.ToString(CallDateFormat)),
+            EndTime = new Time(entity.EndTime),
+            Duration = new Span(entity.Duration),
+            Cost = new Money(entity.Cost, entity.Currency),
+            Reference = new CdrReference(entity.Reference),
+            Type = (CdrCallTypeEnum?)entity.Type, // TODO: improve
+        } : null;
+    }
 }

@@ -1,7 +1,13 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using CDRSandbox.Configurators;
 using CDRSandbox.Extensions;
 using CDRSandbox.Repositories.Clickhouse;
 using CDRSandbox.Repositories.Interfaces;
 using CDRSandbox.Services;
+
+// Global libraries configurations
+DapperConfigurator.Setup();
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,6 +37,13 @@ builder.Services.AddControllers();
 // OpenAPI
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApiConfigs();
+
+// JSON options
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower;
+    options.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+});
 
 #endregion
 

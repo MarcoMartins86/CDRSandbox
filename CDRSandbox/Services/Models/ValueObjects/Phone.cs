@@ -12,7 +12,7 @@ public class Phone : ValueObject
     public Phone(string number)
     {
         if (!ValidationRegex.IsMatch(number))
-            throw new Exception($"Invalid phone number format: {number}");
+            throw new Exception($"Invalid phone number format: [{number}]");
 
         Number = number;
     }
@@ -20,5 +20,10 @@ public class Phone : ValueObject
     protected override IEnumerable<object> GetEqualityComponents()
     {
         yield return Number;
+    }
+
+    public override string ToString()
+    {
+        return Number;
     }
 }

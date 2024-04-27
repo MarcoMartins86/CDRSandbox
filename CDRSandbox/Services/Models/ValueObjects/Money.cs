@@ -4,12 +4,20 @@ namespace CDRSandbox.Services.Models.ValueObjects;
 
 public class Money(double value, string currency) : ValueObject
 {
-    public double Value { get; } = value;
-    public Currency Currency { get; } = new(currency);
+    private const int DefaultDecimalPlaces = 3;
+    private readonly double _amount = value;
+
+    public float Amount => (float)Math.Round(_amount, DefaultDecimalPlaces, MidpointRounding.ToEven);
+    public Currency Currency { get; } = new(currency); // TODO: need to make constructor to exchange to GBP
 
     protected override IEnumerable<object> GetEqualityComponents()
     {
-        yield return Value;
+        yield return Amount;
         yield return Currency;
+    }
+
+    public override string ToString()
+    {
+        return $"{Amount} {Currency}";
     }
 }

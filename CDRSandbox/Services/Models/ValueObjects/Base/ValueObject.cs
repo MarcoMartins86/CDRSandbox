@@ -47,4 +47,6 @@ public abstract class ValueObject
     {
         return NotEqualOperator(one, two);
     }
+
+    public abstract override string ToString();
 }

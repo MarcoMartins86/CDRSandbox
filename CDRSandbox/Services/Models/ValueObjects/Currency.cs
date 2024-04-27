@@ -23,7 +23,7 @@ public class Currency : ValueObject
     public Currency(string code)
     {
         if (!ActiveCurrencyCodesConversionRateToDefaultCurrency.ContainsKey(code))
-            throw new Exception($"Currency code unknown: {code}");
+            throw new Exception($"Currency code unknown: [{code}]");
 
         Code = code;
     }
@@ -31,5 +31,10 @@ public class Currency : ValueObject
     protected override IEnumerable<object> GetEqualityComponents()
     {
         yield return Code;
+    }
+
+    public override string ToString()
+    {
+        return Code;
     }
 }
