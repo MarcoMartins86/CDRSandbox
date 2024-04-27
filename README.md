@@ -33,8 +33,8 @@ And so, I went with another approach more appropriate for this kind of data.
 
 ClickHouse is a high-performance, column-oriented SQL database management system (DBMS) for online analytical processing (OLAP).
 It states that it can handle trillions of rows in and query results in near real-time.
-However, ClickHouse has at least one drawback, it can't handle data updates easily. 
-Nevertheless, given that our datasets are immutable that scenario will not affect us.
+However, ClickHouse has some drawbacks, like it can't handle data updates easily and don't have uniqueness constrains on data.
+Nevertheless, given that our datasets are immutable and uniqueness should be correct on datasets to be loaded that scenarios will not affect us.
 
 Table data types selected:
 - caller_id: `FixedString(32)` since it's a phone number and although, in the sample dataset they have 12 chars I'm not sure that in others it won't go beyond that.
