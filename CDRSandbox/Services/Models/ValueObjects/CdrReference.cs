@@ -13,7 +13,7 @@ public class CdrReference : ValueObject
     public CdrReference(string reference)
     {
         if (!ValidationRegex.IsMatch(reference))
-            throw new Exception($"Invalid Call Detail Record reference: [{reference}]");
+            throw new Exception($"Invalid call detail record reference: [{reference}]");
         Value = reference;
     }
     

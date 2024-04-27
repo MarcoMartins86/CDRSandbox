@@ -20,11 +20,17 @@ public class CdrService(ICdrRepository repository)
         return await repository.StoreAsync(items.Select(i => i.ToObjects()));
     }
 
-    public async Task<CdrItem?> FetchItemAsync(string referenceString)
+    public async Task<CdrItem?> FetchItemAsync(CdrReference reference)
     {
-        var reference = new CdrReference(referenceString);
         var entity = await repository.FetchItemAsync(reference.Value);
 
-        return CdrItem.From(entity);
+        return CdrItem.FromOrNull(entity);
+    }
+
+    public async Task<IEnumerable<CdrItem>> FetchItemsFromCallerAsync(Phone calledId, Date from, Date to, CdrCallTypeEnum? type = 0)
+    {
+        var items = await repository.FetchItemsFromCallerAsync(calledId.ToString(), from.ToDateTime(), to.ToDateTime(), (int?)type);
+        
+        return items.Select(CdrItem.From);
     }
 }

@@ -1,9 +1,12 @@
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Net.Mime;
 using CDRSandbox.Attributes.OpenApi;
 using CDRSandbox.Controllers.Dto;
+using CDRSandbox.Helpers;
 using CDRSandbox.Services;
 using CDRSandbox.Services.Models;
+using CDRSandbox.Services.Models.ValueObjects;
 using CsvHelper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
@@ -14,14 +17,16 @@ namespace CDRSandbox.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-[OpenApiTag("Call Detail Record", Description = "Consumes CSV files and computes metrics on existent data")]
+[OpenApiTag("Call detail record", Description = "Consumes CSV files into the database, fetch records and computes metrics")]
 public class CdrController(CdrService service) : ControllerBase
 {
     [HttpPost("[action]")]
-    [ConsumesLargeFile(
-        "The Call Detail Record CSV file.")] // Workaround: This will write on the OpenAPI the large file specification
-    [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+    [ConsumesLargeFile("The call detail record CSV file.")] // Workaround: This will write on the OpenAPI the large file specification
+    [ProducesResponseType(typeof(long), StatusCodes.Status200OK)]
+    [ForceResponseContentType(StatusCodes.Status200OK, MediaTypeNames.Application.Json, 
+        "Returns the number of records inserted in the database")]
     [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+    [OpenApiOperation("Upload CSV file", "Upload CSV file with the call detail record dataset to store them on the database")]
     // Code was taken for MS sample https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/mvc/models/file-uploads/samples/5.x
     public async Task<IActionResult> UploadFile()
     {
@@ -81,20 +86,79 @@ public class CdrController(CdrService service) : ControllerBase
 
     [HttpGet("{reference}")]
     [ProducesResponseType(typeof(CdrItemDto), StatusCodes.Status200OK)]
+    [ForceResponseContentType(StatusCodes.Status200OK, MediaTypeNames.Application.Json, 
+        "Returns a call detail record item")]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ForceResponseContentType(StatusCodes.Status400BadRequest, MediaTypeNames.Application.ProblemJson)]
     [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+    [OpenApiOperation("Fetch a call detail record", "Fetch a call detail record given its reference")]
     public async Task<IActionResult> Item(
-        [FromRoute] [Required(AllowEmptyStrings = false)] [StringLength(34, MinimumLength = 1)][RegularExpression(CdrItem.ReferencePattern)]
+        [FromRoute] [Required] [RegularExpression(CdrItem.ReferencePattern)]
+        [Description("The call detail record reference")]
         string reference
     )
     {
-        var item = await service.FetchItemAsync(reference);
+        var item = await service.FetchItemAsync(new CdrReference(reference));
         if (item != null)
         {
-            return Ok(CdrItemDto.From(item));
+            return Ok(CdrItemDto.FromOrNull(item));
         }
-        
+
         return NotFound($"The item with reference [{reference}] was not found.");
+    }
+
+
+    [HttpGet("[action]")]
+    [ProducesResponseType(typeof(IEnumerable<CdrItemDto>), StatusCodes.Status200OK)]
+    [ForceResponseContentType(StatusCodes.Status200OK, MediaTypeNames.Application.Json, 
+        "Returns an array of call detail record items or empty when not found")]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ForceResponseContentType(StatusCodes.Status400BadRequest, MediaTypeNames.Application.ProblemJson)]
+    [OpenApiOperation("Fetch call detail records of a caller", "Fetch call detail records of a caller given the caller id, a time frame that is 1 month at max and optionally the call type")]
+    public async Task<IActionResult> FromCaller(
+        [FromQuery] [Required] [RegularExpression(CdrItem.PhoneNumberPattern)]
+        [Description("The caller phone number")]
+        string callerId,
+        [FromQuery] [Required] [RegularExpression(CdrItem.DatePattern)]
+        [Description("A valid date with format " + CdrItem.CallDateFormat)]
+        string from,
+        [FromQuery] [Required] [RegularExpression(CdrItem.DatePattern)]
+        [Description("A valid date with format " + CdrItem.CallDateFormat)]
+        string to,
+        [FromQuery] 
+        [Description("Optional call type (1 = Domestic, 2 = International)")]
+        CdrCallTypeEnum? type = null
+    )
+    {
+        // let us do the final validations
+        if (!DateTimeHelper.TryParseDate(from, out var fromDate))
+            ModelState.AddModelError("from", "Invalid or wrong date format. Must be dd/MM/yyyy.");
+        
+        if (!DateTimeHelper.TryParseDate(to, out var toDate))
+            ModelState.AddModelError("to", "Invalid or wrong date format. Must be dd/MM/yyyy.");
+
+        if (ModelState.ErrorCount > 0)
+            return BadRequest(ModelState);
+
+        if (fromDate > toDate || (toDate - fromDate).TotalDays > 31) // Let's consider that a month it's 31 days
+            ModelState.AddModelError("from/to", $"Invalid time period. Must be positive and cannot exceed 1 month (31 days).");
+        
+        if (ModelState.ErrorCount > 0)
+            return BadRequest(ModelState);
+
+        try
+        {
+            var items = await service.FetchItemsFromCallerAsync(
+                new Phone(callerId),
+                new Date(fromDate),
+                new Date(toDate),
+                type);
+            
+            return Ok(items.Select(CdrItemDto.From));
+        }
+        catch (Exception) // So that we won't expose any sensitive data
+        {
+            return new ObjectResult(null) { StatusCode = StatusCodes.Status500InternalServerError };
+        }
     }
 }

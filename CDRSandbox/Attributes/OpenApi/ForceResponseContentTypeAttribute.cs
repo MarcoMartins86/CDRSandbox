@@ -4,10 +4,10 @@ using NSwag.Generation.Processors.Contexts;
 
 namespace CDRSandbox.Attributes.OpenApi;
 
-public class ForceResponseContentTypeAttribute(int statusCode, string contentType)
-    : OpenApiOperationProcessorAttribute(typeof(ForceResponseContentTypeOperationProcessor), statusCode, contentType)
+public class ForceResponseContentTypeAttribute(int statusCode, string contentType, string description = "")
+    : OpenApiOperationProcessorAttribute(typeof(ForceResponseContentTypeOperationProcessor), statusCode, contentType, description)
 {
-    private class ForceResponseContentTypeOperationProcessor(int statusCode, string contentType) : IOperationProcessor
+    private class ForceResponseContentTypeOperationProcessor(int statusCode, string contentType, string description = "") : IOperationProcessor
     {
         public bool Process(OperationProcessorContext context)
         {
@@ -22,6 +22,8 @@ public class ForceResponseContentTypeAttribute(int statusCode, string contentTyp
                         response.Value.Content.Remove(existentContent.Key);
                         response.Value.Content.Add(contentType, existentContent.Value);
                     }
+
+                    response.Value.Description = description;
                 }
             }
 

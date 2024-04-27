@@ -5,8 +5,7 @@ namespace CDRSandbox.Services.Models.ValueObjects;
 
 public class Phone : ValueObject
 {
-    private const string ValidationPattern = "^\\+?[0-9 ]{0,32}$";
-    private static readonly Regex ValidationRegex = new(ValidationPattern);
+    private static readonly Regex ValidationRegex = new(CdrItem.PhoneNumberPattern);
     public string Number { get; }
 
     public Phone(string number)

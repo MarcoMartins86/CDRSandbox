@@ -1,4 +1,5 @@
-﻿using CDRSandbox.Repositories.ClickHouse.Entities;
+﻿using CDRSandbox.Helpers;
+using CDRSandbox.Repositories.ClickHouse.Entities;
 using CDRSandbox.Repositories.Interfaces;
 using ClickHouse.Client.ADO;
 using ClickHouse.Client.Copy;
@@ -7,7 +8,7 @@ using Microsoft.Extensions.Options;
 
 namespace CDRSandbox.Repositories.ClickHouse;
 
-public class CdrRepositoryClickHouseImpl(IOptions<DbOptionsClickHouse> options) : ICdrRepository, IDisposable
+public class CdrRepositoryClickHouse(IOptions<DbOptionsClickHouse> options) : ICdrRepository, IDisposable
 {
     private const string CallerIdColumn = "caller_id";
     private const string RecipientColumn = "recipient";
@@ -71,5 +72,33 @@ public class CdrRepositoryClickHouseImpl(IOptions<DbOptionsClickHouse> options) 
         );
 
         return item;
+    }
+
+    public async Task<IEnumerable<ICdrItemEntity>> FetchItemsFromCallerAsync(string callerId, DateTime from, DateTime to, int? type)
+    {
+        // since caller_id is a FixedString we need to pad it to its size
+        callerId = ClickHouseHelper.PadFixedString(callerId, 32);
+
+        var sql = $@"
+            SELECT
+                * 
+            FROM 
+                {options.Value.Database}.{TableName} 
+            WHERE 
+                {CallerIdColumn} = @callerId
+                AND {CallDateColumn} >= @from
+                AND {CallDateColumn} < @to
+            ";
+        var parameters = new DynamicParameters(new { callerId, from, to });
+        if (type != null)
+        {
+            sql = $"{sql} AND type = @type";
+            parameters.Add("@type", type);
+        }
+        
+        var items = await _connection.Value.QueryAsync<CdrItemClickHouseEntity>(
+            sql, parameters);
+        
+        return items;
     }
 }

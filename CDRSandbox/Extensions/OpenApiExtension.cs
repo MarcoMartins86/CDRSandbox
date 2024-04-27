@@ -4,7 +4,10 @@ public static class OpenApiExtension
 {
     public static IServiceCollection AddOpenApiConfigs(this IServiceCollection services)
     {
-        services.AddOpenApiDocument();
+        services.AddOpenApiDocument(settings =>
+        {
+            settings.Title = "Call detail record API";
+        });
         return services;
     }
     

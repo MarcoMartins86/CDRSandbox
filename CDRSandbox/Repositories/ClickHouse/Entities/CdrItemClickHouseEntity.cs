@@ -41,6 +41,6 @@ public class CdrItemClickHouseEntity : ICdrItemEntity
     public string Currency { get; set; }
     public int? Type { get; set; } 
     
-    // must be on the same order as CdrRepositoryClickHouseImpl.ColumnsName
+    // must be on the same order as CdrRepositoryClickHouse.ColumnsName
     public object?[] ToObjects() => [CallerId, Recipient, CallDate, EndTime, Duration, Cost, Reference, Currency, Type];
 }

@@ -20,7 +20,7 @@ public class CreateCdrClickHouseTable(IOptions<DbOptionsClickHouse> options) : M
 
         await connection.ExecuteStatementAsync(
             $"""
-             CREATE OR REPLACE TABLE {options.Value.Database}.{CdrRepositoryClickHouseImpl.TableName}
+             CREATE OR REPLACE TABLE {options.Value.Database}.{CdrRepositoryClickHouse.TableName}
              (
                  caller_id FixedString(32),
                  recipient FixedString(32),

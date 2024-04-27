@@ -39,7 +39,7 @@ public class CdrCsvItem
     [Name("type")]
     public CdrCallTypeEnum? Type { get; set; }
 
-    // must be on the same order as CdrRepositoryClickHouseImpl.ColumnsName
+    // must be on the same order as CdrRepositoryClickHouse.ColumnsName
     // This will somewhat break up the DB abstraction, but since datasets can be huge I didn't want to lose more time converting to the Entity 
     public object?[] ToObjects() => [CallerId, Recipient, CallDate, EndTime?.ToString("HH:mm:ss"), Duration, Cost, Reference, Currency, Type];
 }

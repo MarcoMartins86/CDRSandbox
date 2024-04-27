@@ -12,11 +12,16 @@ public class CdrItemDto
     public float Cost { get; set; }
     public string Reference { get; set; }
     public string Currency { get; set; }
-    public int? Type { get; set; }
+    public CdrCallTypeEnum? Type { get; set; }
     
-    public static CdrItemDto? From(CdrItem? item)
+    public static CdrItemDto? FromOrNull(CdrItem? item)
     {
-        return item != null ? new CdrItemDto()
+        return item != null ? From(item) : null;
+    }
+    
+    public static CdrItemDto From(CdrItem item)
+    {
+        return new CdrItemDto()
         {
             CallerId = item.CallerId.ToString(),
             Recipient = item.Recipient.ToString(),
@@ -26,7 +31,7 @@ public class CdrItemDto
             Cost = item.Cost.Amount,
             Reference = item.Reference.ToString(),
             Currency = item.Cost.Currency.ToString(),
-            Type = (int?)item.Type,
-        } : null;
+            Type = item.Type,
+        };
     }
 }
