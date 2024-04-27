@@ -1,7 +1,7 @@
 ﻿using CDRSandbox.Helpers;
 using CDRSandbox.Repositories.Interfaces;
 
-namespace CDRSandbox.Repositories.Clickhouse.Entities;
+namespace CDRSandbox.Repositories.ClickHouse.Entities;
 
 public class CdrItemClickHouseEntity : ICdrItemEntity
 {

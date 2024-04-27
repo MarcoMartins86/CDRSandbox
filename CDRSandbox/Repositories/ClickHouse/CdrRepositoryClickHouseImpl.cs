@@ -1,11 +1,11 @@
-﻿using CDRSandbox.Repositories.Clickhouse.Entities;
+﻿using CDRSandbox.Repositories.ClickHouse.Entities;
 using CDRSandbox.Repositories.Interfaces;
 using ClickHouse.Client.ADO;
 using ClickHouse.Client.Copy;
 using Dapper;
 using Microsoft.Extensions.Options;
 
-namespace CDRSandbox.Repositories.Clickhouse;
+namespace CDRSandbox.Repositories.ClickHouse;
 
 public class CdrRepositoryClickHouseImpl(IOptions<DbOptionsClickHouse> options) : ICdrRepository, IDisposable
 {

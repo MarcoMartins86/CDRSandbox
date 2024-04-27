@@ -2,7 +2,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using CDRSandbox.Configurators;
 using CDRSandbox.Extensions;
-using CDRSandbox.Repositories.Clickhouse;
+using CDRSandbox.Repositories.ClickHouse;
 using CDRSandbox.Repositories.Interfaces;
 using CDRSandbox.Services;
 

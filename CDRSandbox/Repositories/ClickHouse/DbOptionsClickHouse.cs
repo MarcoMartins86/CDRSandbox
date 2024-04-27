@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace CDRSandbox.Repositories.Clickhouse;
+namespace CDRSandbox.Repositories.ClickHouse;
 
 public class DbOptionsClickHouse
 {

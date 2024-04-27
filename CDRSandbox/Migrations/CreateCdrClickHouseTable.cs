@@ -1,4 +1,4 @@
-﻿using CDRSandbox.Repositories.Clickhouse;
+﻿using CDRSandbox.Repositories.ClickHouse;
 using ClickHouse.Client.ADO;
 using ClickHouse.Client.Utility;
 using FluentMigrator;
