@@ -43,4 +43,14 @@ public class Date : ValueObject
     {
         return Value.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc);
     }
+    
+    public static bool operator ==(Date one, DateTime two)
+    {
+        return one.Value == DateOnly.FromDateTime(two);
+    }
+    
+    public static bool operator !=(Date one, DateTime two)
+    {
+        return one.Value != DateOnly.FromDateTime(two);
+    }
 }
