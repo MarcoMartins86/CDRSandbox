@@ -9,6 +9,20 @@ namespace CDRSandboxTests.UnitTests.Controllers;
 [TestFixture]
 public class CdrItemDtoFixture : RandomDataGeneratorsBase
 {
+    private static bool CdrItemDtoEqualsCdrItem(CdrItemDto dto, CdrItem cdrItem)
+    {
+        return dto.CallerId == cdrItem.CallerId.ToString() &&
+               dto.Recipient == cdrItem.Recipient.ToString() &&
+               dto.CallDate == cdrItem.CallDate.ToString() &&
+               dto.EndTime == cdrItem.EndTime.ToString() &&
+               dto.Duration == cdrItem.Duration.TotalSeconds &&
+               dto.EndTime == cdrItem.EndTime.ToString() &&
+               Math.Abs(dto.Cost - cdrItem.Cost.Amount) < 0.001f && // On float we need to use a tolerance for comparison
+               dto.Currency == cdrItem.Cost.Currency.ToString() &&
+               dto.Reference == cdrItem.Reference.ToString() &&
+               dto.Type == cdrItem.Type;
+    }
+    
     [Test]
     public void FromOrNull_CdrItemIsNull_ReturnsNull()
     {
@@ -39,18 +53,8 @@ public class CdrItemDtoFixture : RandomDataGeneratorsBase
         var result = CdrItemDto.FromOrNull(item);
         
         // Assert
-        Assert.That(result, Is.EqualTo(item).Using<CdrItemDto, CdrItem>((dto, cdrItem) =>
-            dto.CallerId == cdrItem.CallerId.ToString() &&
-            dto.Recipient == cdrItem.Recipient.ToString() &&
-            dto.CallDate == cdrItem.CallDate.ToString() &&
-            dto.EndTime == cdrItem.EndTime.ToString() &&
-            dto.Duration == cdrItem.Duration.TotalSeconds &&
-            dto.EndTime == cdrItem.EndTime.ToString() &&
-            Math.Abs(dto.Cost - cdrItem.Cost.Amount) < 0.001f && // On float we need to use a tolerance for comparison
-            dto.Currency == cdrItem.Cost.Currency.ToString() &&
-            dto.Reference == cdrItem.Reference.ToString() &&
-            dto.Type == cdrItem.Type
-            ), "Items content must be equal");
+        Assert.That(result, Is.EqualTo(item).Using<CdrItemDto, CdrItem>(CdrItemDtoEqualsCdrItem),
+            "Items content must be equal");
     }
     
     [Test]
@@ -73,18 +77,8 @@ public class CdrItemDtoFixture : RandomDataGeneratorsBase
         var result = CdrItemDto.FromOrNull(item);
         
         // Assert
-        Assert.That(result, Is.EqualTo(item).Using<CdrItemDto, CdrItem>((dto, cdrItem) =>
-            dto.CallerId == cdrItem.CallerId.ToString() &&
-            dto.Recipient == cdrItem.Recipient.ToString() &&
-            dto.CallDate == cdrItem.CallDate.ToString() &&
-            dto.EndTime == cdrItem.EndTime.ToString() &&
-            dto.Duration == cdrItem.Duration.TotalSeconds &&
-            dto.EndTime == cdrItem.EndTime.ToString() &&
-            Math.Abs(dto.Cost - cdrItem.Cost.Amount) < 0.001f && // On float we need to use a tolerance for comparison
-            dto.Currency == cdrItem.Cost.Currency.ToString() &&
-            dto.Reference == cdrItem.Reference.ToString() &&
-            dto.Type == cdrItem.Type
-        ), "Items content must be equal");
+        Assert.That(result, Is.EqualTo(item).Using<CdrItemDto, CdrItem>(CdrItemDtoEqualsCdrItem),
+            "Items content must be equal");
     }
     
     [Test]
@@ -115,18 +109,8 @@ public class CdrItemDtoFixture : RandomDataGeneratorsBase
         var result = CdrItemDto.From(item);
         
         // Assert
-        Assert.That(result, Is.EqualTo(item).Using<CdrItemDto, CdrItem>((dto, cdrItem) =>
-            dto.CallerId == cdrItem.CallerId.ToString() &&
-            dto.Recipient == cdrItem.Recipient.ToString() &&
-            dto.CallDate == cdrItem.CallDate.ToString() &&
-            dto.EndTime == cdrItem.EndTime.ToString() &&
-            dto.Duration == cdrItem.Duration.TotalSeconds &&
-            dto.EndTime == cdrItem.EndTime.ToString() &&
-            Math.Abs(dto.Cost - cdrItem.Cost.Amount) < 0.001f && // On float we need to use a tolerance for comparison
-            dto.Currency == cdrItem.Cost.Currency.ToString() &&
-            dto.Reference == cdrItem.Reference.ToString() &&
-            dto.Type == cdrItem.Type
-            ), "Items content must be equal");
+        Assert.That(result, Is.EqualTo(item).Using<CdrItemDto, CdrItem>(CdrItemDtoEqualsCdrItem),
+            "Items content must be equal");
     }
     
     [Test]
@@ -149,17 +133,7 @@ public class CdrItemDtoFixture : RandomDataGeneratorsBase
         var result = CdrItemDto.From(item);
         
         // Assert
-        Assert.That(result, Is.EqualTo(item).Using<CdrItemDto, CdrItem>((dto, cdrItem) =>
-            dto.CallerId == cdrItem.CallerId.ToString() &&
-            dto.Recipient == cdrItem.Recipient.ToString() &&
-            dto.CallDate == cdrItem.CallDate.ToString() &&
-            dto.EndTime == cdrItem.EndTime.ToString() &&
-            dto.Duration == cdrItem.Duration.TotalSeconds &&
-            dto.EndTime == cdrItem.EndTime.ToString() &&
-            Math.Abs(dto.Cost - cdrItem.Cost.Amount) < 0.001f && // On float we need to use a tolerance for comparison
-            dto.Currency == cdrItem.Cost.Currency.ToString() &&
-            dto.Reference == cdrItem.Reference.ToString() &&
-            dto.Type == cdrItem.Type
-        ), "Items content must be equal");
+        Assert.That(result, Is.EqualTo(item).Using<CdrItemDto, CdrItem>(CdrItemDtoEqualsCdrItem),
+            "Items content must be equal");
     }
 }

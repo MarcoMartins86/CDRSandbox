@@ -17,11 +17,11 @@ public class RandomDataGeneratorsBase
 
     private readonly IRandomizerTimeSpan _randomizerTimeSpan = RandomizerFactory.GetRandomizer(
         new FieldOptionsTimeSpan()
-            { UseNullValues = false, From = TimeSpan.Zero, To = TimeSpan.MaxValue, IncludeMilliseconds = false });
+            { UseNullValues = false, From = TimeSpan.Zero, To = new TimeSpan(1, 0, 0, 0), IncludeMilliseconds = false });
 
-    private readonly IRandomizerNumber<double> _randomizerCost = RandomizerFactory.GetRandomizer(
-        new FieldOptionsDouble()
-            { UseNullValues = false, Min = 0.000d, Max = 5.000d });
+    private readonly IRandomizerNumber<float> _randomizerCost = RandomizerFactory.GetRandomizer(
+        new FieldOptionsFloat()
+            { UseNullValues = false, Min = 0.000f, Max = 5.000f });
 
     private readonly IRandomizerString _randomizerCurrency =
         RandomizerFactory.GetRandomizer(new FieldOptionsStringList()
@@ -42,7 +42,7 @@ public class RandomDataGeneratorsBase
     protected DateTime RandomDateTime => _randomizerDateTime.Generate()!.Value;
     protected string RandomTime => _randomizerDateTime.Generate()!.Value.ToString(CdrItem.EndTimeFormat);
     protected uint RandomDuration => (uint)_randomizerTimeSpan.Generate()!.Value.TotalSeconds;
-    protected double RandomCost => _randomizerCost.Generate()!.Value;
+    protected float RandomCost => _randomizerCost.Generate()!.Value;
     protected string RandomCurrency => _randomizerCurrency.Generate()!;
     protected string RandomReference => _randomizerReference.Generate()!;
     protected CdrCallTypeEnum RandomType => (CdrCallTypeEnum)_randomizerType.Generate()!;
