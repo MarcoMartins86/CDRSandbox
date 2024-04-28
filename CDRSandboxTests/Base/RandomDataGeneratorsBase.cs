@@ -5,7 +5,7 @@ using RandomDataGenerator.Randomizers;
 
 namespace CDRSandboxTests.Base;
 
-public class RandomDataGeneratorsBase
+public abstract class RandomDataGeneratorsBase
 {
     private readonly IRandomizerString _randomizerPhoneNumber =
         RandomizerFactory.GetRandomizer(new FieldOptionsTextRegex

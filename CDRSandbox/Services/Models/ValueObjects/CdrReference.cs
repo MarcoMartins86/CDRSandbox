@@ -5,14 +5,13 @@ namespace CDRSandbox.Services.Models.ValueObjects;
 
 public class CdrReference : ValueObject
 {
-    
     private static readonly Regex ValidationRegex = new(CdrItem.ReferencePattern);
     
     public string Value { get; }
 
     public CdrReference(string reference)
     {
-        if (!ValidationRegex.IsMatch(reference))
+        if (reference == null || !ValidationRegex.IsMatch(reference))
             throw new Exception($"Invalid call detail record reference: [{reference}]");
         Value = reference;
     }
