@@ -33,4 +33,10 @@ public class CdrService(ICdrRepository repository)
         
         return items.Select(CdrItem.From);
     }
+
+    public async Task<(long count, long totalDuration)> FetchCountTotalDurationCalls(Date from, Date to, CdrCallTypeEnum? type = null)
+    {
+        var result = await repository.FetchCountTotalDurationCalls(from.ToDateTime(), to.ToDateTime(), (int?)type);
+        return result == null ? (0, 0) : (result.Count, result.TotalDuration);
+    }
 }

@@ -1,5 +1,3 @@
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using CDRSandbox.Configurators;
 using CDRSandbox.Extensions;
 using CDRSandbox.Repositories.ClickHouse;
@@ -37,13 +35,6 @@ builder.Services.AddControllers();
 // OpenAPI
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApiConfigs();
-
-// JSON options
-builder.Services.ConfigureHttpJsonOptions(options =>
-{
-    options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower;
-    options.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
-});
 
 #endregion
 

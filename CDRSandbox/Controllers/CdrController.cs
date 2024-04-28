@@ -98,10 +98,19 @@ public class CdrController(CdrService service) : ControllerBase
         string reference
     )
     {
-        var item = await service.FetchRecordAsync(new CdrReference(reference));
-        if (item != null)
+        CdrItem? item;
+
+        try
         {
-            return Ok(CdrItemDto.FromOrNull(item));
+            item = await service.FetchRecordAsync(new CdrReference(reference));
+            if (item != null)
+            {
+                return Ok(CdrItemDto.FromOrNull(item));
+            }
+        }
+        catch (Exception) // So that we won't expose any sensitive data
+        {
+            return new ObjectResult(null) { StatusCode = StatusCodes.Status500InternalServerError };
         }
 
         return NotFound($"The item with reference [{reference}] was not found.");
@@ -125,7 +134,7 @@ public class CdrController(CdrService service) : ControllerBase
         [Description("A valid date with format " + CdrItem.CallDateFormat)]
         string to,
         [FromQuery] 
-        [Description("Optional call type (1 = Domestic, 2 = International)")]
+        [Description("(Optional) Call type (1 = Domestic, 2 = International)")]
         CdrCallTypeEnum? type = null
     )
     {
@@ -153,27 +162,85 @@ public class CdrController(CdrService service) : ControllerBase
         [Description("A valid date with format " + CdrItem.CallDateFormat)]
         string to,
         [FromQuery] 
-        [Description("Optional call type (1 = Domestic, 2 = International)")]
+        [Description("(Optional) Call type (1 = Domestic, 2 = International)")]
         CdrCallTypeEnum? type = null
     )
     {
         return await FetchRecordsAsync(callerId, from, to, type, n);
     }
-
-    private async Task<ObjectResult> FetchRecordsAsync(string callerId, string from, string to, CdrCallTypeEnum? type, long? nExpensiveCall = null)
+    
+    [HttpGet("[action]")]
+    [ProducesResponseType(typeof(CountTotalDurationDto), StatusCodes.Status200OK)]
+    [ForceResponseContentType(StatusCodes.Status200OK, MediaTypeNames.Application.Json, 
+        "Returns a count and total duration of all calls")]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ForceResponseContentType(StatusCodes.Status400BadRequest, MediaTypeNames.Application.ProblemJson)]
+    [OpenApiOperation("Fetch a count and total duration of all calls", "Fetch a count and total duration of all calls given a time frame that is 1 month at max and optionally the call type")]
+    public async Task<IActionResult> CountTotalDurationCalls(
+        [FromQuery] [Required] [RegularExpression(CdrItem.DatePattern)]
+        [Description("A valid date with format " + CdrItem.CallDateFormat)]
+        string from,
+        [FromQuery] [Required] [RegularExpression(CdrItem.DatePattern)]
+        [Description("A valid date with format " + CdrItem.CallDateFormat)]
+        string to,
+        [FromQuery] 
+        [Description("(Optional) Call type (1 = Domestic, 2 = International)")]
+        CdrCallTypeEnum? type = null
+    )
     {
         // let us do the final validations
-        if (!DateTimeHelper.TryParseDate(from, out var fromDate))
-            ModelState.AddModelError("from", "Invalid or wrong date format. Must be dd/MM/yyyy.");
-        
-        if (!DateTimeHelper.TryParseDate(to, out var toDate))
-            ModelState.AddModelError("to", "Invalid or wrong date format. Must be dd/MM/yyyy.");
+        ValidateFromToParsing(from, to,  out var fromDate, out var toDate);
 
         if (ModelState.ErrorCount > 0)
             return BadRequest(ModelState);
 
-        if (fromDate > toDate || (toDate - fromDate).TotalDays > 31) // Let's consider that a month it's 31 days
-            ModelState.AddModelError("from/to", $"Invalid time period. Must be positive and cannot exceed 1 month (31 days).");
+        ValidateTimeInterval(fromDate, toDate);
+        
+        if (ModelState.ErrorCount > 0)
+            return BadRequest(ModelState);
+        
+        try
+        { 
+            var (count, duration) = await service.FetchCountTotalDurationCalls(
+                new Date(fromDate),
+                new Date(toDate),
+                type);
+
+            return Ok(new CountTotalDurationDto() { Count = count, TotalDuration = duration });
+        }
+        catch (Exception) // So that we won't expose any sensitive data
+        {
+            return new ObjectResult(null) { StatusCode = StatusCodes.Status500InternalServerError };
+        }
+    }
+
+    private void ValidateFromToParsing(string from, string to, out DateTime fromDate, out DateTime toDate)
+    {
+        if (!DateTimeHelper.TryParseDate(from, out var fromDateTemp))
+            ModelState.AddModelError("from", "Invalid or wrong date format. Must be dd/MM/yyyy.");
+        
+        if (!DateTimeHelper.TryParseDate(to, out var toDateTemp))
+            ModelState.AddModelError("to", "Invalid or wrong date format. Must be dd/MM/yyyy.");
+
+        fromDate = fromDateTemp;
+        toDate = toDateTemp;
+    }
+
+    private void ValidateTimeInterval(DateTime from, DateTime to)
+    {
+        if (from >= to || (to - from).TotalDays > 31) // Let's consider that a month it's 31 days. TODO: should be a config
+            ModelState.AddModelError("from/to", $"Invalid time period. Must be positive (>0) and cannot exceed 1 month (<=31 days).");
+    }
+
+    private async Task<ObjectResult> FetchRecordsAsync(string callerId, string from, string to, CdrCallTypeEnum? type, long? nExpensiveCall = null)
+    {
+        // let us do the final validations
+        ValidateFromToParsing(from, to,  out var fromDate, out var toDate);
+
+        if (ModelState.ErrorCount > 0)
+            return BadRequest(ModelState);
+
+        ValidateTimeInterval(fromDate, toDate);
         
         if (ModelState.ErrorCount > 0)
             return BadRequest(ModelState);

@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using CDRSandbox.Repositories.ClickHouse.Entities;
+using CDRSandbox.Repositories.ClickHouse.Projections;
 using CDRSandbox.Repositories.Interfaces;
 using ClickHouse.Client.ADO;
 using ClickHouse.Client.Copy;
@@ -72,7 +73,7 @@ public class CdrRepositoryClickHouse(IOptions<DbOptionsClickHouse> options) : IC
     {
         using var bulkCopy = new ClickHouseBulkCopy(options.Value.ConnectionString)
         {
-            DestinationTableName = $"{options.Value.Database}.{TableName}",
+            DestinationTableName = $"{TableName}",
             ColumnNames = ColumnsName,
             BatchSize = BatchSize
         };
@@ -88,7 +89,7 @@ public class CdrRepositoryClickHouse(IOptions<DbOptionsClickHouse> options) : IC
                 SELECT
                     {SqlSelectAllColumns}
                 FROM 
-                    {options.Value.Database}.{TableName}
+                    {TableName}
                 WHERE {ReferenceColumn} = @reference",
             new { reference }
         );
@@ -98,6 +99,7 @@ public class CdrRepositoryClickHouse(IOptions<DbOptionsClickHouse> options) : IC
 
     public async Task<IEnumerable<ICdrItemEntity>> FetchRecordsAsync(string callerId, DateTime from, DateTime to, int? type = null, long? nExpensiveCall = null)
     {
+        var parameters = new DynamicParameters(new { callerId, from, to });
         var sb = new StringBuilder();
 
         if (nExpensiveCall != null)
@@ -113,7 +115,6 @@ public class CdrRepositoryClickHouse(IOptions<DbOptionsClickHouse> options) : IC
             .Append($"{CallerIdColumn} = toFixedString(@callerId,32)")
             .Append($" AND {CallDateColumn} >= @from AND {CallDateColumn} < @to");
         
-        var parameters = new DynamicParameters(new { callerId, from, to });
         if (type != null)
         {
             sb.Append($" AND {TypeColumn} = @type");
@@ -127,5 +128,32 @@ public class CdrRepositoryClickHouse(IOptions<DbOptionsClickHouse> options) : IC
             sb.ToString(), parameters);
         
         return items;
+    }
+
+    public async Task<ICdrCountTotalDuration?> FetchCountTotalDurationCalls(DateTime from, DateTime to, int? type = null)
+    {
+        var parameters = new DynamicParameters(new { from, to });
+        var sb = new StringBuilder();
+   
+        sb
+            .Append("WITH ")
+            .Append($"{CallDateColumn} >= @from AND {CallDateColumn} < @to");
+            
+        if (type != null)
+        {
+            sb.Append($" AND {TypeColumn} = @type");
+            parameters.Add("@type", type);
+        }
+        
+        sb
+            .Append(" AS condition")
+            .Append(" SELECT ")
+            .Append($"countIf({DurationColumn},condition) AS count, sumIf({DurationColumn},condition) AS total_duration")
+            .Append(" FROM ")
+            .Append(TableName);
+
+        var result = await _connection.Value.QueryFirstOrDefaultAsync<CdrCountTotalDuration>(sb.ToString(), parameters);
+
+        return result;
     }
 }
