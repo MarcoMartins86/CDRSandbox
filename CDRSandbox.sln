@@ -15,6 +15,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "clickhouse", "clickhouse", 
 		DockerConfigs\clickhouse\config.xml = DockerConfigs\clickhouse\config.xml
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CDRSandboxTests", "CDRSandboxTests\CDRSandboxTests.csproj", "{FC9EF0B0-CF0C-4957-BDAF-615716E92492}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,6 +27,10 @@ Global
 		{53D48D89-9AE1-4388-9C24-526C02C1D35C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{53D48D89-9AE1-4388-9C24-526C02C1D35C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{53D48D89-9AE1-4388-9C24-526C02C1D35C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FC9EF0B0-CF0C-4957-BDAF-615716E92492}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FC9EF0B0-CF0C-4957-BDAF-615716E92492}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FC9EF0B0-CF0C-4957-BDAF-615716E92492}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FC9EF0B0-CF0C-4957-BDAF-615716E92492}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{ACCD0F58-34E2-4073-AB8B-C1502E696ABD} = {7957F347-9044-45DC-9539-6AE5EE3CA1E0}

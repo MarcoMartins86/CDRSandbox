@@ -6,8 +6,8 @@ public class Currency : ValueObject
 {
     // TODO: this should be improved to have the active currency codes list and rates in a configurable place 
     // TODO: add more if needed
-    private static readonly HashSet<string> ActiveCurrency = ["AUD", "EUR", "CNY", "GBP", "JPY", "USD"];
-    public static Currency DefaultCurrency = new("GBP");
+    public static readonly string[] ActiveCurrencyArray = ["AUD", "EUR", "CNY", "GBP", "JPY", "USD"];
+    private static readonly HashSet<string> ActiveCurrency = [..ActiveCurrencyArray];
     
     public string Code { get; }
 

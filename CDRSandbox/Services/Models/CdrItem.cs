@@ -6,7 +6,7 @@ namespace CDRSandbox.Services.Models;
 public class CdrItem
 {
     public const string DatePattern = "^[0-9]{2}\\/[0-9]{2}\\/[0-9]{4}$";
-    public const string PhoneNumberPattern = "^\\+?[0-9 ]{0,32}$";
+    public const string PhoneNumberPattern = "^\\+?[0-9 ]{4,32}$";
     public const string ReferencePattern = "^[0-9a-fA-F]{1,33}$";
     
     
