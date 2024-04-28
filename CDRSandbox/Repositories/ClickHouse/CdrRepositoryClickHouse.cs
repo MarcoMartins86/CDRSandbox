@@ -110,7 +110,8 @@ public class CdrRepositoryClickHouse(IOptions<DbOptionsClickHouse> options) : IC
             .Append(" FROM ")
             .Append(TableName)
             .Append(" WHERE ")
-            .Append($"{CallerIdColumn} = toFixedString(@callerId,32)");
+            .Append($"{CallerIdColumn} = toFixedString(@callerId,32)")
+            .Append($" AND {CallDateColumn} >= @from AND {CallDateColumn} < @to");
         
         var parameters = new DynamicParameters(new { callerId, from, to });
         if (type != null)
