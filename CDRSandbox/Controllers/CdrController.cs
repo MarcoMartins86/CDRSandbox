@@ -2,7 +2,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Net.Mime;
 using CDRSandbox.Attributes.OpenApi;
-using CDRSandbox.Controllers.Dto;
+using CDRSandbox.Controllers.Dtos;
 using CDRSandbox.Helpers;
 using CDRSandbox.Services;
 using CDRSandbox.Services.Models;

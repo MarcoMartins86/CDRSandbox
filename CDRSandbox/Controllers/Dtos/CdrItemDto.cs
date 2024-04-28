@@ -1,6 +1,6 @@
 ﻿using CDRSandbox.Services.Models;
 
-namespace CDRSandbox.Controllers.Dto;
+namespace CDRSandbox.Controllers.Dtos;
 
 public class CdrItemDto
 {

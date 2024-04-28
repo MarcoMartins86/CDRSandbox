@@ -1,4 +1,4 @@
-﻿namespace CDRSandbox.Controllers.Dto;
+﻿namespace CDRSandbox.Controllers.Dtos;
 
 public class CountTotalDurationDto
 {

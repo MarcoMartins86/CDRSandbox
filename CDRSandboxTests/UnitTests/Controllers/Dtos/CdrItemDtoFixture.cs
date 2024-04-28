@@ -1,10 +1,10 @@
-﻿using CDRSandbox.Controllers.Dto;
+﻿using CDRSandbox.Controllers.Dtos;
 using CDRSandbox.Services.Models;
 using CDRSandbox.Services.Models.ValueObjects;
 using CDRSandboxTests.Base;
 using NUnit.Framework;
 
-namespace CDRSandboxTests.UnitTests.Controllers;
+namespace CDRSandboxTests.UnitTests.Controllers.Dtos;
 
 [TestFixture]
 public class CdrItemDtoFixture : RandomDataGeneratorsBase
