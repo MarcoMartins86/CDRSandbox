@@ -98,7 +98,7 @@ public class CdrController(CdrService service) : ControllerBase
         string reference
     )
     {
-        var item = await service.FetchItemAsync(new CdrReference(reference));
+        var item = await service.FetchRecordAsync(new CdrReference(reference));
         if (item != null)
         {
             return Ok(CdrItemDto.FromOrNull(item));
@@ -107,17 +107,16 @@ public class CdrController(CdrService service) : ControllerBase
         return NotFound($"The item with reference [{reference}] was not found.");
     }
 
-
     [HttpGet("[action]")]
     [ProducesResponseType(typeof(IEnumerable<CdrItemDto>), StatusCodes.Status200OK)]
     [ForceResponseContentType(StatusCodes.Status200OK, MediaTypeNames.Application.Json, 
         "Returns an array of call detail record items or empty when not found")]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ForceResponseContentType(StatusCodes.Status400BadRequest, MediaTypeNames.Application.ProblemJson)]
-    [OpenApiOperation("Fetch call detail records of a caller", "Fetch call detail records of a caller given the caller id, a time frame that is 1 month at max and optionally the call type")]
-    public async Task<IActionResult> FromCaller(
+    [OpenApiOperation("Fetch call detail records", "Fetch call detail records of a caller given the caller id, a time frame that is 1 month at max and optionally the call type")]
+    public async Task<IActionResult> Records(
         [FromQuery] [Required] [RegularExpression(CdrItem.PhoneNumberPattern)]
-        [Description("The caller phone number")]
+        [Description("The caller id (phone number)")]
         string callerId,
         [FromQuery] [Required] [RegularExpression(CdrItem.DatePattern)]
         [Description("A valid date with format " + CdrItem.CallDateFormat)]
@@ -129,6 +128,39 @@ public class CdrController(CdrService service) : ControllerBase
         [Description("Optional call type (1 = Domestic, 2 = International)")]
         CdrCallTypeEnum? type = null
     )
+    {
+        return await FetchRecordsAsync(callerId, from, to, type);
+    }
+    
+    [HttpGet("[action]")]
+    [ProducesResponseType(typeof(IEnumerable<CdrItemDto>), StatusCodes.Status200OK)]
+    [ForceResponseContentType(StatusCodes.Status200OK, MediaTypeNames.Application.Json, 
+        "Returns an array of call detail record items or empty when not found")]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ForceResponseContentType(StatusCodes.Status400BadRequest, MediaTypeNames.Application.ProblemJson)]
+    [OpenApiOperation("Fetch call detail records of N most expensive calls", "Fetch call detail records of N most expensive calls of a caller given the caller id, a time frame that is 1 month at max and optionally the call type")]
+    public async Task<IActionResult> ExpensiveCallsRecords(
+        [FromQuery] [Required] [Range(1, 1000)]
+        [Description("The (N)umber of most expensive calls")]
+        long n,
+        [FromQuery] [Required] [RegularExpression(CdrItem.PhoneNumberPattern)]
+        [Description("The caller id (phone number)")]
+        string callerId,
+        [FromQuery] [Required] [RegularExpression(CdrItem.DatePattern)]
+        [Description("A valid date with format " + CdrItem.CallDateFormat)]
+        string from,
+        [FromQuery] [Required] [RegularExpression(CdrItem.DatePattern)]
+        [Description("A valid date with format " + CdrItem.CallDateFormat)]
+        string to,
+        [FromQuery] 
+        [Description("Optional call type (1 = Domestic, 2 = International)")]
+        CdrCallTypeEnum? type = null
+    )
+    {
+        return await FetchRecordsAsync(callerId, from, to, type, n);
+    }
+
+    private async Task<ObjectResult> FetchRecordsAsync(string callerId, string from, string to, CdrCallTypeEnum? type, long? nExpensiveCall = null)
     {
         // let us do the final validations
         if (!DateTimeHelper.TryParseDate(from, out var fromDate))
@@ -145,14 +177,15 @@ public class CdrController(CdrService service) : ControllerBase
         
         if (ModelState.ErrorCount > 0)
             return BadRequest(ModelState);
-
+        
         try
         {
-            var items = await service.FetchItemsFromCallerAsync(
+            var items = await service.FetchRecordsAsync(
                 new Phone(callerId),
                 new Date(fromDate),
                 new Date(toDate),
-                type);
+                type,
+                nExpensiveCall);
             
             return Ok(items.Select(CdrItemDto.From));
         }

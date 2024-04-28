@@ -26,10 +26,10 @@ builder.Services.AddMigrateDbConfigs();
 
 // Db Abstractions initialization
 builder.Services.AddOptions<DbOptionsClickHouse>().BindConfiguration("ConnectionStrings").ValidateDataAnnotations().ValidateOnStart();
-builder.Services.AddScoped<ICdrRepository, CdrRepositoryClickHouse>();
+builder.Services.AddScoped<ICdrRepository, CdrRepositoryClickHouse>(); // scoped so that connection to DB can be disposed correctly
 
 // Our Services
-builder.Services.AddScoped<CdrService>(); // Scoped because ICdrRepository TODO: if ICdrRepository can be singleton change this
+builder.Services.AddScoped<CdrService>(); // Scoped because ICdrRepository
 
 // Web API
 builder.Services.AddControllers();

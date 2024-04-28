@@ -10,10 +10,11 @@
 * CSV `call_date` is in format dd/MM/yyyy, d/MM/yyyy or dd/M/yyyy and always present.
 * CSV `end_time` is in format HH:mm:ss and always present.
 * CSV `duration` is an unsigned integer and always present.
-* CSV `cost` is a positive floating point with at most 3 decimal places and always present.
+* CSV `cost` is a positive floating point with at most 3 decimal places and always present. Is the cost per second of the call.
 * CSV `reference` is a string with hexadecimal representation of a binary of at most 33 chars, unique in all data sets and always present.
 * CSV `currency` is a ISO 4217 3 letter string, and one of ["AUD", "EUR", "CNY", "GBP", "JPY", "USD"]. 
 * CSV `type` can be null, 1 or 2, because on sample data it does not exist and in specs mention that can be 1 or 2.
+* Same CSV file is only uploaded once (future improvement: protect this).
 
 ## Technology Decisions
 

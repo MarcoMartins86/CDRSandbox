@@ -1,4 +1,5 @@
-﻿using CDRSandbox.Repositories.ClickHouse.Entities;
+﻿using System.Text;
+using CDRSandbox.Repositories.ClickHouse.Entities;
 using CDRSandbox.Repositories.Interfaces;
 using ClickHouse.Client.ADO;
 using ClickHouse.Client.Copy;
@@ -22,6 +23,8 @@ public class CdrRepositoryClickHouse(IOptions<DbOptionsClickHouse> options) : IC
     public const string CurrencyColumn = "currency";
     public const string TypeColumn = "type";
 
+    public const string TotalCostDefaultCurrencyMaterializedColumn = "total_cost_default_currency";
+
     // when we're calling an sql method on a column, we can't call it the same, because the WHERE cause would not use the indices
     private static readonly string SqlSelectAllColumns = $@"
         toStringCutToZero({CallerIdColumn}) AS {CallerIdUnpadColumn},
@@ -34,8 +37,7 @@ public class CdrRepositoryClickHouse(IOptions<DbOptionsClickHouse> options) : IC
         {CurrencyColumn},
         {TypeColumn}
     ";
-
-
+    
     public const string TableName = "call_detail_record";
     public const int BatchSize = 10000; // TODO: this should be a config
 
@@ -79,7 +81,7 @@ public class CdrRepositoryClickHouse(IOptions<DbOptionsClickHouse> options) : IC
         return bulkCopy.RowsWritten;
     }
 
-    public async Task<ICdrItemEntity?> FetchItemAsync(string reference)
+    public async Task<ICdrItemEntity?> FetchRecordAsync(string reference)
     {
         var item = await _connection.Value.QueryFirstOrDefaultAsync<CdrItemClickHouseEntity?>(
             $@"
@@ -94,26 +96,34 @@ public class CdrRepositoryClickHouse(IOptions<DbOptionsClickHouse> options) : IC
         return item;
     }
 
-    public async Task<IEnumerable<ICdrItemEntity>> FetchItemsFromCallerAsync(string callerId, DateTime from, DateTime to, int? type)
+    public async Task<IEnumerable<ICdrItemEntity>> FetchRecordsAsync(string callerId, DateTime from, DateTime to, int? type = null, long? nExpensiveCall = null)
     {
-        var sql = $@"
-            SELECT
-                {SqlSelectAllColumns} 
-            FROM 
-                {options.Value.Database}.{TableName} 
-            WHERE 
-                {CallerIdColumn} = toFixedString(@callerId,32)
-        ";
+        var sb = new StringBuilder();
+
+        if (nExpensiveCall != null)
+            sb.Append($"SELECT TOP {nExpensiveCall} ");
+        else
+            sb.Append("SELECT ");
+
+        sb
+            .Append(SqlSelectAllColumns)
+            .Append(" FROM ")
+            .Append(TableName)
+            .Append(" WHERE ")
+            .Append($"{CallerIdColumn} = toFixedString(@callerId,32)");
         
         var parameters = new DynamicParameters(new { callerId, from, to });
         if (type != null)
         {
-            sql = $"{sql} AND type = @type";
+            sb.Append($" AND {TypeColumn} = @type");
             parameters.Add("@type", type);
         }
         
+        if (nExpensiveCall != null)
+            sb.Append($"ORDER BY {TotalCostDefaultCurrencyMaterializedColumn} DESC");
+        
         var items = await _connection.Value.QueryAsync<CdrItemClickHouseEntity>(
-            sql, parameters);
+            sb.ToString(), parameters);
         
         return items;
     }
