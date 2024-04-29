@@ -123,7 +123,7 @@ public class CdrRepositoryClickHouse(IOptions<DbOptionsClickHouse> options) : IC
         }
         
         if (nExpensiveCall != null)
-            sb.Append($"ORDER BY {TotalCostDefaultCurrencyMaterializedColumn} DESC");
+            sb.Append($" ORDER BY {TotalCostDefaultCurrencyMaterializedColumn} DESC");
         
         var items = await _connection.Value.QueryAsync<CdrItemClickHouseEntity>(
             sb.ToString(), parameters);
