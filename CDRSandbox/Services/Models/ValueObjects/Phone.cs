@@ -10,7 +10,7 @@ public class Phone : ValueObject
 
     public Phone(string number)
     {
-        if (string.IsNullOrWhiteSpace(number) || !ValidationRegex.IsMatch(number))
+        if (number == null || !ValidationRegex.IsMatch(number))
             throw new Exception($"Invalid phone number format: [{number}]");
 
         Number = number;

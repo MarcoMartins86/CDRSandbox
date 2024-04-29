@@ -117,6 +117,36 @@ public class CdrControllerFixture : TestServerBase
     }
     
     [Test]
+    public async Task Record_ByReference_WithEmptyCallerId_Found()
+    {
+        // Arrange
+        var callerId = "";
+        var items = new List<CdrCsvItem>();
+        for (int i = 0; i < 5; i++)
+        {
+            var newItem = RandomCdrCsvItem(callerId);
+            items.Add(newItem);
+        }
+        items.AddRange(RandomCdrCsvItems(5, 5));
+        var inserts = await ClickHouseHelper.Store(items, ConnectionString);
+        Assert.That(inserts, Is.GreaterThan(0)); // check that entries are on the DB
+        var itemToFetch = items.First();
+
+        // Act 
+        var result = _restClient.Get(new RestRequest($"/cdr/{itemToFetch.Reference}"));
+
+        // Assert
+        Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.OK), "Call must have OK status code");
+        Assert.That(result.Content, Is.Not.Null.And.Not.Empty, "Content can't be null nor empty");
+        CdrItemDto? data = null;
+        Assert.DoesNotThrow(() => data = Deserialize<CdrItemDto>(result.Content), 
+            "Received data must be deserializable to the dto");
+        Assert.That(data, Is.Not.Null, "Deserialized data can't be null");
+        Assert.That(data, Is.EqualTo(itemToFetch).Using<CdrItemDto, CdrCsvItem>(Comparators.CdrItemDtoEqualsCdrCsvItem),
+            "Received data must be the same than the one insert in DB");
+    }
+    
+    [Test]
     public async Task Record_ByReference_NotFound()
     {
         // Arrange
