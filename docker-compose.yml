@@ -9,6 +9,11 @@
       dockerfile: CDRSandbox/Dockerfile
     ports:
       - "${CDRSANDBOX_HTTP_PORT}:8080"
+    healthcheck:
+      test: curl --fail http://localhost:8080/health || exit 1
+      interval: 5s
+      timeout: 5s
+      retries: 5
   
   clickhouse:
     image: clickhouse/clickhouse-server:${CLICKHOUSE_VERSION}
