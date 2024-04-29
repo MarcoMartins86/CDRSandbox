@@ -72,8 +72,9 @@ public class MoneyFixture : RandomDataGeneratorsBase
     {
         // Arrange
         var cost = RandomCost;
-        var one = new Money(cost, RandomCurrency);
-        var two = new Money(cost, RandomCurrency);
+        // don't use random here since the data is so few that they will be equal a quite of times
+        var one = new Money(cost, Currency.ActiveCurrencyArray[0]);
+        var two = new Money(cost, Currency.ActiveCurrencyArray[1]);
         
         // Act
         // Assert
