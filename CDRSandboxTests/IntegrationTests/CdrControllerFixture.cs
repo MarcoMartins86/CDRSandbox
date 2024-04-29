@@ -4,6 +4,8 @@ using CDRSandbox.Repositories.ClickHouse;
 using CDRSandbox.Services.Models;
 using CDRSandboxTests.Base;
 using CDRSandboxTests.Helpers;
+using ClickHouse.Client.ADO;
+using Dapper;
 using NUnit.Framework;
 using RestSharp;
 using Testcontainers.ClickHouse;
@@ -59,6 +61,35 @@ public class CdrControllerFixture : TestServerBase
         // Let's replace the DB Options to use the Testcontainer instance
         services.Configure<DbOptionsClickHouse>(options => { options.ConnectionString = ConnectionString; });
     }
+
+    #region UploadFile
+
+    [Test]
+    public async Task UploadFile()
+    {
+        // Arrange
+        var lastLineReference = "CE8601A46C11D40D746DCD9058F6C360D";
+        var numberLines = 13035; // 13036 with header
+        var request = new RestRequest("cdr/UploadFile");
+        request.AddFile("cdr_data_samples.csv", "Resources/cdr_data_samples.csv");
+        
+        // Act
+        var result = _restClient.Post(request);
+        
+        // Assert
+        Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.OK), "Call must have OK status code");
+        Assert.That(result.Content, Is.Not.Null.And.Not.Empty, "Content can't be null nor empty");
+        Assert.That(result.Content, Is.EqualTo(numberLines.ToString()));
+        // And now check that entries are really on the DB
+        var connection = new ClickHouseConnection(ConnectionString);
+        var count = await connection.QuerySingleAsync<int>($"SELECT COUNT(*) FROM {CdrRepositoryClickHouse.TableName}");
+        Assert.That(count, Is.EqualTo(numberLines));
+        var found = await connection.QuerySingleAsync<bool>(
+            $"SELECT (EXISTS (SELECT * FROM {CdrRepositoryClickHouse.TableName} WHERE reference = '{lastLineReference}'))");
+        Assert.That(found, Is.True);
+    }
+
+    #endregion
 
     #region Record_ByReference
     

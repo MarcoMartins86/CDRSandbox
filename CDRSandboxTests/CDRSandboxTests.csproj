@@ -20,6 +20,10 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Content Include="..\Resources\cdr_data_samples.csv">
+        <Link>Resources\cdr_data_samples.csv</Link>
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
       <None Remove="Resources\ClickHouseConfig.xml" />
       <Content Include="Resources\ClickHouseConfig.xml">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
