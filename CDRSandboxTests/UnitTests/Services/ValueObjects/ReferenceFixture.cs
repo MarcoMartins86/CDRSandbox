@@ -5,7 +5,7 @@ using NUnit.Framework;
 namespace CDRSandboxTests.UnitTests.Services.ValueObjects;
 
 [TestFixture]
-public class CdrReferenceFixture : RandomDataGeneratorsBase
+public class ReferenceFixture : RandomDataGeneratorsBase
 {
     [Test]
     public void Creation_ReferenceValid()
@@ -15,7 +15,7 @@ public class CdrReferenceFixture : RandomDataGeneratorsBase
         for (int i = 0; i < 10000; i++) // let's test 10000 random values just to make sure
         {
             var reference = RandomReference;
-            Assert.DoesNotThrow(() => new CdrReference(reference),
+            Assert.DoesNotThrow(() => new Reference(reference),
                 "Creation with valid pattern must not throw. Error reference [{0}]", reference);
         }
     }
@@ -25,7 +25,7 @@ public class CdrReferenceFixture : RandomDataGeneratorsBase
     {
         // Act
         // Assert
-        Assert.Throws<Exception>(() => new CdrReference(null!), "Must throw with null reference");
+        Assert.Throws<Exception>(() => new Reference(null!), "Must throw with null reference");
     }
     
     [Test]
@@ -33,7 +33,7 @@ public class CdrReferenceFixture : RandomDataGeneratorsBase
     {
         // Act
         // Assert
-        Assert.Throws<Exception>(() => new CdrReference("LHOIBP"), "Must throw with invalid reference");
+        Assert.Throws<Exception>(() => new Reference("LHOIBP"), "Must throw with invalid reference");
     }
     
     [Test]
@@ -41,7 +41,7 @@ public class CdrReferenceFixture : RandomDataGeneratorsBase
     {
         // Act
         // Assert
-        Assert.Throws<Exception>(() => new CdrReference("      "), "Must throw with only spaces");
+        Assert.Throws<Exception>(() => new Reference("      "), "Must throw with only spaces");
     }
     
     [Test]
@@ -49,15 +49,15 @@ public class CdrReferenceFixture : RandomDataGeneratorsBase
     {
         // Arrange
         var reference = RandomReference;
-        var one = new CdrReference(reference);
-        var two = new CdrReference(reference);
+        var one = new Reference(reference);
+        var two = new Reference(reference);
         
         // Act
         // Assert
         Assert.That(one == two, Is.True, "Must be equal");
         Assert.That(one.Equals(two), Is.True,"Must be equal");
         Assert.That(Equals(one, two), Is.True,"Must be equal");
-        Assert.That(EqualityComparer<CdrReference>.Default.Equals(two, two), Is.True,"Must be equal");
+        Assert.That(EqualityComparer<Reference>.Default.Equals(two, two), Is.True,"Must be equal");
         Assert.That(one, Is.EqualTo(two), "Must be equal");
     }
     
@@ -65,8 +65,8 @@ public class CdrReferenceFixture : RandomDataGeneratorsBase
     public void Inequality()
     {
         // Arrange
-        var one = new CdrReference(RandomReference);
-        var two = new CdrReference(RandomReference);
+        var one = new Reference(RandomReference);
+        var two = new Reference(RandomReference);
         
         // Act
         // Assert
@@ -81,6 +81,6 @@ public class CdrReferenceFixture : RandomDataGeneratorsBase
         
         // Act
         // Assert
-        Assert.That(new CdrReference(reference).ToString(), Is.EqualTo(reference), "Must be equal");
+        Assert.That(new Reference(reference).ToString(), Is.EqualTo(reference), "Must be equal");
     }
 }

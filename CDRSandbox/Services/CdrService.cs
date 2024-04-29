@@ -20,9 +20,9 @@ public class CdrService(ICdrRepository repository)
         return await repository.StoreAsync(items.Select(i => i.ToObjects()));
     }
 
-    public async Task<CdrItem?> FetchRecordAsync(CdrReference reference)
+    public async Task<CdrItem?> FetchRecordAsync(Reference reference)
     {
-        var entity = await repository.FetchRecordAsync(reference.Value);
+        var entity = await repository.FetchRecordAsync(reference.ToString());
 
         return CdrItem.FromOrNull(entity);
     }

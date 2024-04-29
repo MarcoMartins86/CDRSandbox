@@ -102,7 +102,7 @@ public class CdrController(CdrService service) : ControllerBase
 
         try
         {
-            item = await service.FetchRecordAsync(new CdrReference(reference));
+            item = await service.FetchRecordAsync(new Reference(reference));
             if (item != null)
             {
                 return Ok(CdrItemDto.FromOrNull(item));

@@ -90,7 +90,7 @@ public abstract class RandomDataGeneratorsBase
             EndTime = new Time(endTime ?? RandomTime),
             Duration = new Span(duration ?? RandomDuration),
             Cost = new Money(cost ?? RandomCost, currency ?? RandomCurrency),
-            Reference = new CdrReference(reference ?? RandomReference),
+            Reference = new Reference(reference ?? RandomReference),
             Type = type ?? RandomTypeOrNull
         };
     }

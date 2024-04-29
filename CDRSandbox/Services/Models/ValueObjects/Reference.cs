@@ -3,13 +3,13 @@ using CDRSandbox.Services.Models.ValueObjects.Base;
 
 namespace CDRSandbox.Services.Models.ValueObjects;
 
-public class CdrReference : ValueObject
+public class Reference : ValueObject
 {
     private static readonly Regex ValidationRegex = new(CdrItem.ReferencePattern);
     
-    public string Value { get; }
+    private string Value { get; }
 
-    public CdrReference(string reference)
+    public Reference(string reference)
     {
         if (reference == null || !ValidationRegex.IsMatch(reference))
             throw new Exception($"Invalid call detail record reference: [{reference}]");

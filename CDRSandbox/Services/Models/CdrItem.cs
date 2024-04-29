@@ -19,7 +19,7 @@ public class CdrItem
     public Time EndTime { get; set; }
     public Span Duration { get; set; }
     public Money Cost { get; set; }
-    public CdrReference Reference { get; set; }
+    public Reference Reference { get; set; }
     public CdrCallTypeEnum? Type { get; set; }
 
     public static CdrItem? FromOrNull(ICdrItemEntity? entity)
@@ -37,7 +37,7 @@ public class CdrItem
             EndTime = new Time(entity.EndTime),
             Duration = new Span(entity.Duration),
             Cost = new Money(entity.Cost, entity.Currency),
-            Reference = new CdrReference(entity.Reference),
+            Reference = new Reference(entity.Reference),
             Type = (CdrCallTypeEnum?)entity.Type, // TODO: improve
         };
     }

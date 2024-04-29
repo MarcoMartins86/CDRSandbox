@@ -32,7 +32,7 @@ public class CdrItemDtoFixture : RandomDataGeneratorsBase
             EndTime = new Time(RandomTime),
             Duration = new Span(RandomDuration),
             Cost = new Money(RandomCost, RandomCurrency),
-            Reference = new CdrReference(RandomReference),
+            Reference = new Reference(RandomReference),
             Type = RandomType
         };
         
@@ -56,7 +56,7 @@ public class CdrItemDtoFixture : RandomDataGeneratorsBase
             EndTime = new Time(RandomTime),
             Duration = new Span(RandomDuration),
             Cost = new Money(RandomCost, RandomCurrency),
-            Reference = new CdrReference(RandomReference),
+            Reference = new Reference(RandomReference),
             Type = null
         };
         
@@ -88,7 +88,7 @@ public class CdrItemDtoFixture : RandomDataGeneratorsBase
             EndTime = new Time(RandomTime),
             Duration = new Span(RandomDuration),
             Cost = new Money(RandomCost, RandomCurrency),
-            Reference = new CdrReference(RandomReference),
+            Reference = new Reference(RandomReference),
             Type = RandomType
         };
         
@@ -112,7 +112,7 @@ public class CdrItemDtoFixture : RandomDataGeneratorsBase
             EndTime = new Time(RandomTime),
             Duration = new Span(RandomDuration),
             Cost = new Money(RandomCost, RandomCurrency),
-            Reference = new CdrReference(RandomReference),
+            Reference = new Reference(RandomReference),
             Type = null
         };
         
