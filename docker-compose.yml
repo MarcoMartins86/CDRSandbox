@@ -25,7 +25,7 @@
     ulimits:
       nofile: 262144 # increase file descriptors
     volumes:
-      - ./DockerConfigs/clickhouse/config.xml:/etc/clickhouse-server/config.xml
+      - ./DockerConfigs/clickhouse/config.xml:/etc/clickhouse-server/config.d/config.xml
     healthcheck:
       test: wget --no-verbose --tries=1 --spider localhost:8123/ping || exit 1
       interval: 5s

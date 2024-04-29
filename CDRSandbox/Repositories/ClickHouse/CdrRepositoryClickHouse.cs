@@ -27,6 +27,7 @@ public class CdrRepositoryClickHouse(IOptions<DbOptionsClickHouse> options) : IC
     public const string TotalCostDefaultCurrencyMaterializedColumn = "total_cost_default_currency";
 
     // when we're calling an sql method on a column, we can't call it the same, because the WHERE cause would not use the indices
+    // TODO: improve the enum handling with strings
     private static readonly string SqlSelectAllColumns = $@"
         toStringCutToZero({CallerIdColumn}) AS {CallerIdUnpadColumn},
         toStringCutToZero({RecipientColumn}) AS {RecipientUnpadColumn},
@@ -36,13 +37,13 @@ public class CdrRepositoryClickHouse(IOptions<DbOptionsClickHouse> options) : IC
         {CostColumn},
         toStringCutToZero({ReferenceColumn}) AS {ReferenceColumnUnpadColumn},
         {CurrencyColumn},
-        {TypeColumn}
+        CAST({TypeColumn}, 'Int8') AS {TypeColumn}
     ";
     
     public const string TableName = "call_detail_record";
     public const int BatchSize = 10000; // TODO: this should be a config
 
-    private static readonly string[] ColumnsName =
+    public static readonly string[] ColumnsName =
     [
         CallerIdColumn,
         RecipientColumn,
@@ -73,7 +74,7 @@ public class CdrRepositoryClickHouse(IOptions<DbOptionsClickHouse> options) : IC
     {
         using var bulkCopy = new ClickHouseBulkCopy(options.Value.ConnectionString)
         {
-            DestinationTableName = $"{TableName}",
+            DestinationTableName = TableName,
             ColumnNames = ColumnsName,
             BatchSize = BatchSize
         };

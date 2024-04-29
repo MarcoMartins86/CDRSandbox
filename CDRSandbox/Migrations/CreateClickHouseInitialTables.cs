@@ -17,9 +17,6 @@ public class CreateClickHouseInitialTables(IOptions<DbOptionsClickHouse> options
     public override async void Up()
     {
         await using var connection = new ClickHouseConnection(options.Value.ConnectionString);
-        
-        // these SQL must contain everything hard-coded and not with classes variables
-        // since it's running on a DB versioning system
 
         // Seems that we need to give this role to be able to use dictionaries with a user
         // https://clickhouse.com/docs/en/sql-reference/statements/create/dictionary
@@ -41,26 +38,26 @@ public class CreateClickHouseInitialTables(IOptions<DbOptionsClickHouse> options
         // Add some currency conversion rates
         await connection.ExecuteStatementAsync(
             """
-            INSERT INTO CDRSandboxDB.currency_rate (code, rate) VALUES
-             (toUInt64(hex('AUD')), toFloat64(0.52279068)),
-             (toUInt64(hex('EUR')), toFloat64(0.85589298)),
-             (toUInt64(hex('CNY')), toFloat64(0.11046396)),
-             (toUInt64(hex('GBP')), toFloat64(1)),
-             (toUInt64(hex('JPY')), toFloat64(0.0050577936)),
-             (toUInt64(hex('USD')), toFloat64(0.80045178));
+            INSERT INTO currency_rate (code, rate) VALUES
+             (reinterpretAsUInt64('AUD'), toFloat64(0.52279068)),
+             (reinterpretAsUInt64('EUR'), toFloat64(0.85589298)),
+             (reinterpretAsUInt64('CNY'), toFloat64(0.11046396)),
+             (reinterpretAsUInt64('GBP'), toFloat64(1)),
+             (reinterpretAsUInt64('JPY'), toFloat64(0.0050577936)),
+             (reinterpretAsUInt64('USD'), toFloat64(0.80045178));
             """
         );
         
         // Create a dictionary to help us pre-computed some metrics
         await connection.ExecuteStatementAsync(
-            """
+            $"""
             CREATE OR REPLACE DICTIONARY currency_rate_dictionary
             (
                 code UInt64,
                 rate Float64
             )
             PRIMARY KEY code
-            SOURCE(CLICKHOUSE(TABLE 'currency_rate' USER 'clickhouse' PASSWORD 'Password12345' DB 'CDRSandboxDB'))
+            SOURCE(CLICKHOUSE(TABLE 'currency_rate' USER '{options.Value.Username}' PASSWORD '{options.Value.Password}' DB '{options.Value.Database}'))
             LAYOUT(HASHED())
             LIFETIME(MIN 60 MAX 120)
             """
@@ -68,8 +65,8 @@ public class CreateClickHouseInitialTables(IOptions<DbOptionsClickHouse> options
         
         // create the table that will hold the datasets and pre-computed metrics
         await connection.ExecuteStatementAsync(
-            """
-             CREATE OR REPLACE TABLE call_detail_record
+            $"""
+             CREATE OR REPLACE TABLE {CdrRepositoryClickHouse.TableName}
              (
                  caller_id FixedString(32),
                  recipient FixedString(32),
@@ -80,7 +77,7 @@ public class CreateClickHouseInitialTables(IOptions<DbOptionsClickHouse> options
                  reference FixedString(33),
                  currency FixedString(3),
                  type Nullable(Enum8('domestic' = 1, 'international' = 2)),
-                 total_cost_default_currency Float64 MATERIALIZED cost * duration * dictGet('currency_rate_dictionary', 'rate', toUInt64(hex(currency)))
+                 total_cost_default_currency Float64 MATERIALIZED cost * duration * dictGet('currency_rate_dictionary', 'rate', reinterpretAsUInt64(currency))
              )
              ENGINE = MergeTree
              PARTITION BY toYYYYMM(call_date)

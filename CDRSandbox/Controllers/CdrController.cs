@@ -92,7 +92,7 @@ public class CdrController(CdrService service) : ControllerBase
     [ForceResponseContentType(StatusCodes.Status400BadRequest, MediaTypeNames.Application.ProblemJson)]
     [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
     [OpenApiOperation("Fetch a call detail record", "Fetch a call detail record given its reference")]
-    public async Task<IActionResult> Item(
+    public async Task<IActionResult> Record(
         [FromRoute] [Required] [RegularExpression(CdrItem.ReferencePattern)]
         [Description("The call detail record reference")]
         string reference

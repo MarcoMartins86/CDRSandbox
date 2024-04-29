@@ -61,3 +61,8 @@ app.MapControllers();
 app.Run();
 
 #endregion
+
+
+// For tests since the <InternalsVisibleTo> in csproj was not working
+// https://learn.microsoft.com/en-us/aspnet/core/test/integration-tests?view=aspnetcore-8.0
+public partial class Program { }

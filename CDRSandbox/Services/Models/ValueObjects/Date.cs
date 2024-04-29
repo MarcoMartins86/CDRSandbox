@@ -8,7 +8,7 @@ public class Date : ValueObject
     public const string DefaultFormat = CdrItem.CallDateFormat; // TODO
     public static readonly string[] AcceptedFormats = [CdrItem.CallDateFormat]; // TODO
 
-    public DateOnly Value { get; }
+    private DateOnly Value { get; }
 
     public Date(string date)
     {
@@ -34,15 +34,11 @@ public class Date : ValueObject
         yield return Value;
     }
 
-    public override string ToString()
-    {
-        return Value.ToString(DefaultFormat);
-    }
+    public override string ToString() => Value.ToString(DefaultFormat);
 
-    public DateTime ToDateTime()
-    {
-        return Value.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc);
-    }
+    public DateTime ToDateTime() => Value.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc);
+    
+    public DateOnly ToDateOnly() => Value;
     
     public static bool operator ==(Date one, DateTime two)
     {
