@@ -729,4 +729,282 @@ public class CdrControllerFixture : TestServerBase
     }
 
     #endregion
+
+    #region CountTotalDurationCalls_ByPeriod
+    
+    [Test]
+    public async Task CountTotalDurationCalls_ByPeriod_Found()
+    {
+        // Arrange
+        // let's use a period in the future since RandomDateTime are all in the past, and since we don't filter by id
+        // other DB entries would be count
+        var from = (DateTime.UtcNow + TimeSpan.FromDays(10)).Date;
+        var to = (from + TimeSpan.FromDays(30)).Date;
+        var items = new List<CdrCsvItem>();
+        var count = 0;
+        var duration = 0L;
+        for (int i = 0; i < 1000; i++)
+        {
+            var newItem = RandomCdrCsvItem(callDate:from.AddDays(Random.Next(0, 60)));
+            items.Add(newItem);
+            var callDateDt = newItem.CallDate!.Value.ToDateTime(TimeOnly.MinValue).Date;
+            if (from <= callDateDt && callDateDt < to)
+            {
+                count++;
+                duration += newItem.Duration!.Value;
+            }
+        }
+        // It's not likely but if there aren't items within that period let's create at least three
+        if (count == 0)
+        {
+            var one = RandomCdrCsvItem(callDate:from.AddDays(1));
+            var two = RandomCdrCsvItem(callDate:from.AddDays(2));
+            var three = RandomCdrCsvItem(callDate:from.AddDays(3));
+            items.Add(one);
+            items.Add(two);
+            items.Add(three);
+            count += 3;
+            duration += one.Duration!.Value;
+            duration += two.Duration!.Value;
+            duration += three.Duration!.Value;
+        }
+        // Add them to DB
+        var inserts = await ClickHouseHelper.Store(items, ConnectionString);
+        Assert.That(inserts, Is.GreaterThan(0)); // check that entries are on the DB
+        // Build the request
+        var request = new RestRequest($"/cdr/CountTotalDurationCalls");
+        request.AddQueryParameter("from", from.ToString(CdrItem.CallDateFormat));
+        request.AddQueryParameter("to", to.ToString(CdrItem.CallDateFormat));
+
+        // Act 
+        var result = _restClient.Get(request);
+
+        // Assert
+        Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.OK), "Call must have OK status code");
+        Assert.That(result.Content, Is.Not.Null.And.Not.Empty, "Content can't be null nor empty");
+        CountTotalDurationDto? data = null;
+        Assert.DoesNotThrow(() => data = Deserialize<CountTotalDurationDto>(result.Content), 
+            "Received data must be deserializable to a list of dtos");
+        Assert.That(data, Is.Not.Null, "Deserialized data can't be null");
+        Assert.That(data!.Count, Is.EqualTo(count), "Number of items must be the same");
+        Assert.That(count, Is.LessThan(items.Count), "There must be more records id DB");
+        Assert.That(data.TotalDuration, Is.EqualTo(duration),
+            "Received duration must be the same");
+    }
+    
+    [Test]
+    public async Task CountTotalDurationCalls_ByPeriodAndType_Found()
+    {
+        // Arrange
+        // let's use a period in the future since RandomDateTime are all in the past, and since we don't filter by id
+        // other DB entries would be count
+        // test above already uses 10 + 60 in the future
+        var from = (DateTime.UtcNow + TimeSpan.FromDays(100)).Date;
+        var to = (from + TimeSpan.FromDays(30)).Date;
+        var type = CdrCallTypeEnum.International;
+        var items = new List<CdrCsvItem>();
+        var count = 0;
+        var duration = 0L;
+        for (int i = 0; i < 1000; i++)
+        {
+            var newItem = RandomCdrCsvItem(callDate:from.AddDays(Random.Next(0, 60)));
+            items.Add(newItem);
+            var callDateDt = newItem.CallDate!.Value.ToDateTime(TimeOnly.MinValue).Date;
+            if (from <= callDateDt && callDateDt < to && type == newItem.Type)
+            {
+                count++;
+                duration += newItem.Duration!.Value;
+            }
+        }
+        // It's not likely but if there aren't items within that period and type let's create at least three
+        if (count == 0)
+        {
+            var one = RandomCdrCsvItem(callDate:from.AddDays(1), type:type);
+            var two = RandomCdrCsvItem(callDate:from.AddDays(2), type:type);
+            var three = RandomCdrCsvItem(callDate:from.AddDays(3), type:type);
+            items.Add(one);
+            items.Add(two);
+            items.Add(three);
+            count += 3;
+            duration += one.Duration!.Value;
+            duration += two.Duration!.Value;
+            duration += three.Duration!.Value;
+        }
+
+        // Add them to DB
+        var inserts = await ClickHouseHelper.Store(items, ConnectionString);
+        Assert.That(inserts, Is.GreaterThan(0)); // check that entries are on the DB
+        // Build the request
+        var request = new RestRequest($"/cdr/CountTotalDurationCalls");
+        request.AddQueryParameter("from", from.ToString(CdrItem.CallDateFormat));
+        request.AddQueryParameter("to", to.ToString(CdrItem.CallDateFormat));
+        request.AddQueryParameter("type", type);
+
+        // Act 
+        var result = _restClient.Get(request);
+
+        // Assert
+        Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.OK), "Call must have OK status code");
+        Assert.That(result.Content, Is.Not.Null.And.Not.Empty, "Content can't be null nor empty");
+        CountTotalDurationDto? data = null;
+        Assert.DoesNotThrow(() => data = Deserialize<CountTotalDurationDto>(result.Content), 
+            "Received data must be deserializable to a list of dtos");
+        Assert.That(data, Is.Not.Null, "Deserialized data can't be null");
+        Assert.That(data!.Count, Is.EqualTo(count), "Number of items must be the same");
+        Assert.That(count, Is.LessThan(items.Count), "There must be more records id DB");
+        Assert.That(data.TotalDuration, Is.EqualTo(duration),
+            "Received duration must be the same");
+    }
+    
+    [Test]
+    public async Task CountTotalDurationCalls_ByPeriod_NotFound()
+    {
+        // Arrange
+        var from = (DateTime.UtcNow - TimeSpan.FromDays(365)).Date;
+        var to = (from + TimeSpan.FromDays(30)).Date;
+        var items = new List<CdrCsvItem>();
+        var count = 0;
+        var duration = 0L;
+        for (int i = 0; i < 1000; i++)
+        {
+            var newItem = RandomCdrCsvItem();
+            items.Add(newItem);
+            var callDateDt = newItem.CallDate!.Value.ToDateTime(TimeOnly.MinValue).Date;
+            if (from <= callDateDt && callDateDt < to)
+            {
+                count++;
+                duration += newItem.Duration!.Value;
+            }
+        }
+        Assert.That(count, Is.Zero, "Must not be able to fetch any items");
+        //Also let's add other callers
+        items.AddRange(RandomCdrCsvItems(1000, 10));
+        // Add them to DB
+        var inserts = await ClickHouseHelper.Store(items, ConnectionString);
+        Assert.That(inserts, Is.GreaterThan(0)); // check that entries are on the DB
+        // Build the request
+        var request = new RestRequest($"/cdr/CountTotalDurationCalls");
+        request.AddQueryParameter("from", from.ToString(CdrItem.CallDateFormat));
+        request.AddQueryParameter("to", to.ToString(CdrItem.CallDateFormat));
+
+        // Act 
+        var result = _restClient.Get(request);
+
+        // Assert
+        Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.OK), "Call must have OK status code");
+        Assert.That(result.Content, Is.Not.Null.And.Not.Empty, "Content can't be null nor empty");
+        CountTotalDurationDto? data = null;
+        Assert.DoesNotThrow(() => data = Deserialize<CountTotalDurationDto>(result.Content), 
+            "Received data must be deserializable to a list of dtos");
+        Assert.That(data, Is.Not.Null, "Deserialized data can't be null");
+        Assert.That(data!.Count, Is.EqualTo(count), "Number of items must be the same");
+        Assert.That(count, Is.LessThan(items.Count), "There must be more records id DB");
+        Assert.That(data.TotalDuration, Is.EqualTo(duration),
+            "Received duration must be the same");
+    }
+    
+    
+    [Test]
+    public void CountTotalDurationCalls_ByPeriodFromBadFormat_BadRequest()
+    {
+        // Arrange
+        var from = (DateTime.UtcNow - TimeSpan.FromDays(50)).Date;
+        var to = (from + TimeSpan.FromDays(20)).Date;
+        var request = new RestRequest($"/cdr/CountTotalDurationCalls");
+        request.AddQueryParameter("from", DateTime.UtcNow.Date);
+        request.AddQueryParameter("to", to.ToString(CdrItem.CallDateFormat));
+
+        // Act 
+        // Assert
+        var ex = Assert.Throws<HttpRequestException>(() => _restClient.Get(request));
+        Assert.That(ex!.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest),
+            "Call must have BadRequest status code");
+    }
+    
+    [Test]
+    public void CountTotalDurationCalls_ByPeriodToBadFormat_BadRequest()
+    {
+        // Arrange
+        var from = (DateTime.UtcNow - TimeSpan.FromDays(50)).Date;
+        var request = new RestRequest($"/cdr/CountTotalDurationCalls");
+        request.AddQueryParameter("from", from.ToString(CdrItem.CallDateFormat));
+        request.AddQueryParameter("to", DateTime.UtcNow.Date);
+
+        // Act 
+        // Assert
+        var ex = Assert.Throws<HttpRequestException>(() => _restClient.Get(request));
+        Assert.That(ex!.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest),
+            "Call must have BadRequest status code");
+    }
+    
+    [Test]
+    public void CountTotalDurationCalls_ByPeriodTypeBadFormat_BadRequest()
+    {
+        // Arrange
+        var from = (DateTime.UtcNow - TimeSpan.FromDays(50)).Date;
+        var to = (from + TimeSpan.FromDays(20)).Date;
+        var request = new RestRequest($"/cdr/CountTotalDurationCalls");
+        request.AddQueryParameter("from", from.ToString(CdrItem.CallDateFormat));
+        request.AddQueryParameter("to", to.ToString(CdrItem.CallDateFormat));
+        request.AddQueryParameter("type", 3);
+
+        // Act 
+        // Assert
+        var ex = Assert.Throws<HttpRequestException>(() => _restClient.Get(request));
+        Assert.That(ex!.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest),
+            "Call must have BadRequest status code");
+    }
+    
+    [Test]
+    public void CountTotalDurationCalls_ByPeriodPeriodBigger1Month_BadRequest()
+    {
+        // Arrange
+        var from = (DateTime.UtcNow - TimeSpan.FromDays(365)).Date;
+        var to = (from + TimeSpan.FromDays(60)).Date;
+        var request = new RestRequest($"/cdr/CountTotalDurationCalls");
+        request.AddQueryParameter("from", from.ToString(CdrItem.CallDateFormat));
+        request.AddQueryParameter("to", to.ToString(CdrItem.CallDateFormat));
+
+        // Act 
+        // Assert
+        var ex = Assert.Throws<HttpRequestException>(() => _restClient.Get(request));
+        Assert.That(ex!.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest),
+            "Call must have BadRequest status code");
+    }
+    
+    [Test]
+    public void CountTotalDurationCalls_ByPeriodPeriodNegative_BadRequest()
+    {
+        // Arrange
+        var from = (DateTime.UtcNow - TimeSpan.FromDays(365)).Date;
+        var to = (from - TimeSpan.FromDays(60)).Date;
+        var request = new RestRequest($"/cdr/CountTotalDurationCalls");
+        request.AddQueryParameter("from", from.ToString(CdrItem.CallDateFormat));
+        request.AddQueryParameter("to", to.ToString(CdrItem.CallDateFormat));
+
+        // Act 
+        // Assert
+        var ex = Assert.Throws<HttpRequestException>(() => _restClient.Get(request));
+        Assert.That(ex!.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest),
+            "Call must have BadRequest status code");
+    }
+    
+    [Test]
+    public void CountTotalDurationCalls_ByPeriodPeriod0Days_BadRequest()
+    {
+        // Arrange
+        var from = (DateTime.UtcNow - TimeSpan.FromDays(365)).Date;
+        var to = from;
+        var request = new RestRequest($"/cdr/CountTotalDurationCalls");
+        request.AddQueryParameter("from", from.ToString(CdrItem.CallDateFormat));
+        request.AddQueryParameter("to", to.ToString(CdrItem.CallDateFormat));
+
+        // Act 
+        // Assert
+        var ex = Assert.Throws<HttpRequestException>(() => _restClient.Get(request));
+        Assert.That(ex!.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest),
+            "Call must have BadRequest status code");
+    }
+    
+    #endregion
 }

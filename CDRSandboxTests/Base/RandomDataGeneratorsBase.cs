@@ -55,6 +55,7 @@ public abstract class RandomDataGeneratorsBase
     private static readonly ConcurrentDictionary<string, byte> UniqueReferenceConstrainer = new();
     private static readonly ConcurrentDictionary<string, byte> UniqueCallerIdConstrainer = new();
 
+    protected readonly Random Random = new();
     protected string RandomPhoneNumber =>
         EnsureRandomUniqueness(() => RandomizerPhoneNumber.Generate()!, UniqueCallerIdConstrainer);
     protected DateTime RandomDateTime => RandomizerDateTime.Generate()!.Value;
