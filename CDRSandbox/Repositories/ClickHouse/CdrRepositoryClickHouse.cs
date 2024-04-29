@@ -37,7 +37,7 @@ public class CdrRepositoryClickHouse(IOptions<DbOptionsClickHouse> options) : IC
         {CostColumn},
         toStringCutToZero({ReferenceColumn}) AS {ReferenceColumnUnpadColumn},
         {CurrencyColumn},
-        CAST({TypeColumn}, 'Int8') AS {TypeColumn}
+        CAST({TypeColumn}, 'Nullable(UInt8)') AS {TypeColumn}
     ";
     
     public const string TableName = "call_detail_record";

@@ -15,7 +15,7 @@
 * CSV `currency` is a ISO 4217 3 letter string, and one of ["AUD", "EUR", "CNY", "GBP", "JPY", "USD"]. 
 * CSV `type` can be null, 1 or 2, because on sample data it does not exist and in specs mention that can be 1 or 2.
 * Same CSV file is only uploaded once (future improvement: protect this).
-* Time frame queries works like from <= [end_date] < to
+* Time frame queries works like from <= [call_date] < to
 
 ## Technology Decisions
 

@@ -15,8 +15,8 @@ public abstract class RandomDataGeneratorsBase
     private static readonly IRandomizerDateTime RandomizerDateTime = RandomizerFactory.GetRandomizer(
         new FieldOptionsDateTime()
         {
-            UseNullValues = false, From = DateTime.UtcNow - TimeSpan.FromDays(365), To = DateTime.UtcNow,
-            IncludeTime = true
+            UseNullValues = false, From = DateTime.UtcNow - TimeSpan.FromDays(62) /* 2 months */,
+            To = DateTime.UtcNow, IncludeTime = true
         });
 
     private static readonly IRandomizerTimeSpan RandomizerTimeSpan = RandomizerFactory.GetRandomizer(
@@ -65,7 +65,7 @@ public abstract class RandomDataGeneratorsBase
     protected string RandomReference =>
         EnsureRandomUniqueness(() => RandomizerReference.Generate()!, UniqueReferenceConstrainer);
     protected CdrCallTypeEnum RandomType => (CdrCallTypeEnum)RandomizerType.Generate()!;
-    protected CdrCallTypeEnum? RandomTypeOrNull => (CdrCallTypeEnum?)RandomizerType.Generate();
+    protected CdrCallTypeEnum? RandomTypeOrNull => (CdrCallTypeEnum?)RandomizerTypeOrNull.Generate();
 
     private T EnsureRandomUniqueness<T>(Func<T> generator, ConcurrentDictionary<T, byte> uniqueConstrainer) where T : class
     {
@@ -118,19 +118,24 @@ public abstract class RandomDataGeneratorsBase
         return result; 
     }
 
-    protected IEnumerable<CdrCsvItem> RandomCdrCsvItems(int numberItems, int cdrPerCaller = 1)
+    private CdrCsvItem CdrItem2CdrCsvItem(CdrItem item) => new()
     {
-        return RandomCdrItems(numberItems, cdrPerCaller).Select(item => new CdrCsvItem()
-        {
-            CallerId = item.CallerId.ToString(),
-            Recipient = item.Recipient.ToString(),
-            CallDate = item.CallDate.ToDateOnly(),
-            EndTime = item.EndTime.ToTimeOnly(),
-            Duration = item.Duration.TotalSeconds,
-            Cost = item.Cost.Amount,
-            Currency = item.Cost.Currency.ToString(),
-            Reference = item.Reference.ToString(),
-            Type = item.Type
-        });
-    }
+        CallerId = item.CallerId.ToString(),
+        Recipient = item.Recipient.ToString(),
+        CallDate = item.CallDate.ToDateOnly(),
+        EndTime = item.EndTime.ToTimeOnly(),
+        Duration = item.Duration.TotalSeconds,
+        Cost = item.Cost.Amount,
+        Currency = item.Cost.Currency.ToString(),
+        Reference = item.Reference.ToString(),
+        Type = item.Type
+    };
+
+    protected IEnumerable<CdrCsvItem> RandomCdrCsvItems(int numberItems, int cdrPerCaller = 1) =>
+        RandomCdrItems(numberItems, cdrPerCaller).Select(CdrItem2CdrCsvItem);
+
+    protected CdrCsvItem RandomCdrCsvItem(string? callerId = null, string? recipient = null, DateTime? callDate = null,
+        string? endTime = null, uint? duration = null, float? cost = null, string? currency = null,
+        string? reference = null, CdrCallTypeEnum? type = null) =>
+        CdrItem2CdrCsvItem(RandomCdrItem(callerId, recipient, callDate, endTime, duration, cost, currency, reference, type));
 }
