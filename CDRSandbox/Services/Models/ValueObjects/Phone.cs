@@ -6,11 +6,11 @@ namespace CDRSandbox.Services.Models.ValueObjects;
 public class Phone : ValueObject
 {
     private static readonly Regex ValidationRegex = new(CdrItem.PhoneNumberPattern);
-    public string Number { get; }
+    private string Number { get; }
 
     public Phone(string number)
     {
-        if (!ValidationRegex.IsMatch(number))
+        if (string.IsNullOrWhiteSpace(number) || !ValidationRegex.IsMatch(number))
             throw new Exception($"Invalid phone number format: [{number}]");
 
         Number = number;
