@@ -82,8 +82,7 @@ public class CdrControllerFixture : TestServerBase
         Assert.That(result.Content, Is.EqualTo(numberLines.ToString()));
         // And now check that entries are really on the DB
         var connection = new ClickHouseConnection(ConnectionString);
-        var count = await connection.QuerySingleAsync<int>($"SELECT COUNT(*) FROM {CdrRepositoryClickHouse.TableName}");
-        Assert.That(count, Is.EqualTo(numberLines));
+        // we can't count because DB can have records already so let's find the last one on the dataset
         var found = await connection.QuerySingleAsync<bool>(
             $"SELECT (EXISTS (SELECT * FROM {CdrRepositoryClickHouse.TableName} WHERE reference = '{lastLineReference}'))");
         Assert.That(found, Is.True);
