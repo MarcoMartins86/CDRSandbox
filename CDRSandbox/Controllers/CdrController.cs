@@ -16,6 +16,7 @@ using NSwag.Annotations;
 namespace CDRSandbox.Controllers;
 
 [ApiController]
+[DisableRequestSizeLimit]
 [Route("[controller]")]
 [OpenApiTag("Call detail record", Description = "Consumes CSV files into the database, fetch records and computes metrics")]
 public class CdrController(CdrService service) : ControllerBase
