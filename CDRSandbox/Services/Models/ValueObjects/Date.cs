@@ -12,7 +12,7 @@ public class Date : ValueObject
 
     public Date(string date)
     {
-        if (!DateOnly.TryParseExact(date, AcceptedFormats, DateTimeFormatInfo.InvariantInfo,
+        if (string.IsNullOrWhiteSpace(date) || !DateOnly.TryParseExact(date, AcceptedFormats, DateTimeFormatInfo.InvariantInfo,
                 DateTimeStyles.None, out var dateOnly))
             throw new Exception($"Date in and unknown format: [{date}]. Accepted formats: [{string.Join(',', AcceptedFormats)}]");
 
@@ -36,7 +36,7 @@ public class Date : ValueObject
 
     public override string ToString() => Value.ToString(DefaultFormat);
 
-    public DateTime ToDateTime() => Value.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc);
+    public DateTime ToDateTime() => Value.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc).Date;
     
     public DateOnly ToDateOnly() => Value;
     
