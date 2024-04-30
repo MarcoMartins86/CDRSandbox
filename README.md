@@ -152,3 +152,4 @@ Helps make calling endpoints an easy task.
 * Improve OpenAPI descriptions, add company iconography, and better examples.
 * Tackle compilation warnings.
 * Address code TODOs.
+* Add the ability to use ENV variables to configure the connection string to the DB.
