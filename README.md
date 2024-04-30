@@ -2,22 +2,24 @@
 
 <!-- TOC start (generated with https://github.com/derlin/bitdowntoc) -->
 
+- [How to run](#how-to-run)
 - [Assumptions](#assumptions)
 - [Technology Decisions](#technology-decisions)
-    * [AspNet Core Web API Project](#aspnet-core-web-api-project)
-    * [Layered architecture](#layered-architecture)
-    * [Repository pattern](#repository-pattern)
-    * [ClickHouse for the database](#clickhouse-for-the-database)
-    * [FluentMigrator](#fluentmigrator)
-    * [Docker containers](#docker-containers)
-    * [Receive files as a stream when uploaded](#receive-files-as-a-stream-when-uploaded)
-    * [Using CsvHelper library to parse the CDR dataset file](#using-csvhelper-library-to-parse-the-cdr-dataset-file)
-    * [ClickHouse.Client with Dapper libraries to handle ClickHouse data communication](#clickhouseclient-with-dapper-libraries-to-handle-clickhouse-data-communication)
-    * [Nunit for tests](#nunit-for-tests)
-    * [RandomDataGenerator.Net for tests](#randomdatageneratornet-for-tests)
-    * [Testcontainers for integration tests](#testcontainers-for-integration-tests)
-    * [Microsoft.AspNetCore.Mvc.Testing for integration tests](#microsoftaspnetcoremvctesting-for-integration-tests)
-    * [RestSharp for integration tests](#restsharp-for-integration-tests)
+  * [AspNet Core Web API Project](#aspnet-core-web-api-project)
+  * [Layered architecture](#layered-architecture)
+  * [Repository pattern](#repository-pattern)
+  * [ClickHouse for the database](#clickhouse-for-the-database)
+  * [FluentMigrator](#fluentmigrator)
+  * [Docker containers](#docker-containers)
+  * [Receive files as a stream when uploaded](#receive-files-as-a-stream-when-uploaded)
+  * [Using CsvHelper library to parse the CDR dataset file](#using-csvhelper-library-to-parse-the-cdr-dataset-file)
+  * [ClickHouse.Client with Dapper libraries to handle ClickHouse data communication](#clickhouseclient-with-dapper-libraries-to-handle-clickhouse-data-communication)
+  * [OpenApi for Endpoint documentation](#openapi-for-endpoint-documentation)
+  * [NUnit for tests](#nunit-for-tests)
+  * [RandomDataGenerator.Net for tests](#randomdatageneratornet-for-tests)
+  * [Testcontainers for integration tests](#testcontainers-for-integration-tests)
+  * [Microsoft.AspNetCore.Mvc.Testing for integration tests](#microsoftaspnetcoremvctesting-for-integration-tests)
+  * [RestSharp for integration tests](#restsharp-for-integration-tests)
 - [Future Work](#future-work)
 
 <!-- TOC end -->
@@ -27,9 +29,13 @@ First, make sure that you have:
 * Docker installed
 * .Net 8 SDK
 
-Then to compile/start the application run `start.bat`, to stop and remove resources from docker run `stop.bat`. 
+Then to compile/start the application run `start.bat`, to stop and remove resources from docker run `stop.bat`.
 Otherwise, you can always open the `.sln` file and compile/run it on your favorite IDE.
-If wanted to run tests outside of IDE and to generate the test report, run `run_tests.bat`.
+
+If wanted to run tests outside of IDE, run `run_tests.bat`.
+
+When started, you can access http://localhost:8080/swagger for viewing/trying the API but also http://localhost:8080/redoc if you prefer.
+
 
 ## Assumptions
 * CSV files always contain the header with the columns name, although it can omit the type.
@@ -43,7 +49,7 @@ If wanted to run tests outside of IDE and to generate the test report, run `run_
 * CSV `duration` is an unsigned integer and always present.
 * CSV `cost` is a positive floating point with at most 3 decimal places and is always present. Also, it's the cost per second of the call.
 * CSV `reference` is a string with a hexadecimal representation of a binary and has at most 33 chars, unique in all data sets and always present.
-* CSV `currency` is a ISO 4217 3 letter string, and one of ["AUD", "EUR", "CNY", "GBP", "JPY", "USD"]. 
+* CSV `currency` is a ISO 4217 3 letter string, and one of ["AUD", "EUR", "CNY", "GBP", "JPY", "USD"].
 * CSV `type` can be null, 1 or 2, because on sample data it does not exist and in specs mentions that it can be 1 or 2.
 * The same CSV file is only uploaded once (future improvement: protect this).
 * Time frame queries work like from <= [call_date] < to
@@ -62,7 +68,7 @@ Controllers -> Services -> Repositories
 So in the future, if needed, we can use multiple repositories or just exchange to another.
 
 ### ClickHouse for the database
-Since datasets can be huge (GB), certainly it would bring relational databases (RDBMS) like SQL Server, PostgreSQL, and the like to their knees since they are row oriented. 
+Since datasets can be huge (GB), certainly it would bring relational databases (RDBMS) like SQL Server, PostgreSQL, and the like to their knees since they are row oriented.
 And so, I went with another approach more appropriate for this kind of data.
 
 ClickHouse is a high-performance, column-oriented SQL database management system (DBMS) for online analytical processing (OLAP).
@@ -135,7 +141,7 @@ Helps make calling endpoints an easy task.
 * Change the first script of creating the Clickhouse tables to remove the "OR REPLACE". It's there now just to facilitate the development.
 * Create a clickhouse cluster to have resiliency.
 * Code performance/load tests, also test with huge data sets.
-* Add an observability/traceability/logging stack with alerting/monitoring to proactively solve the problems before they happen or at least faster. 
+* Add an observability/traceability/logging stack with alerting/monitoring to proactively solve the problems before they happen or at least faster.
 * Change some hard-coded things in code to a DB config.
 * The usual stuff, use a compilation pipeline that always runs the test suit, preferably at PR opening and not daily.
 * Use something like Sonarqube on the compilation pipeline to enforce code quality and test coverage.
@@ -144,7 +150,5 @@ Helps make calling endpoints an easy task.
 * Add the authentication/authorization if this would be open to the "world".
 * Add TLS support.
 * Improve OpenAPI descriptions, add company iconography, and better examples.
-* Tackle compilation warnings
-
-
-
+* Tackle compilation warnings.
+* Address code TODOs.
