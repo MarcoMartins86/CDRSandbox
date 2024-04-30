@@ -22,6 +22,15 @@
 
 <!-- TOC end -->
 
+## How to run
+First, make sure that you have:
+* Docker installed
+* .Net 8 SDK
+
+Then to compile/start the application run `start.bat`, to stop and remove resources from docker run `stop.bat`. 
+Otherwise, you can always open the `.sln` file and compile/run it on your favorite IDE.
+If wanted to run tests outside of IDE and to generate the test report, run `run_tests.bat`.
+
 ## Assumptions
 * CSV files always contain the header with the columns name, although it can omit the type.
 * CSV files are in UTF-8.
@@ -95,7 +104,7 @@ Dapper helps out when fetching query results and converting them to objects.
 ### OpenApi for Endpoint documentation
 It integrates well within the code base, and is currently one of the standard ways to do it.
 
-### Nunit for tests
+### NUnit for tests
 This one was just because I'm familiar with it.
 
 ### RandomDataGenerator.Net for tests
@@ -133,6 +142,9 @@ Helps make calling endpoints an easy task.
 * Use a CVE code analyzer to give visibility to possible serious problems.
 * Do a brainstorm to discuss other metrics that would make sense on the existent data and implement them.
 * Add the authentication/authorization if this would be open to the "world".
+* Add TLS support.
+* Improve OpenAPI descriptions, add company iconography, and better examples.
+* Tackle compilation warnings
 
 
 

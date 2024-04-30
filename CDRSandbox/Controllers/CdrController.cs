@@ -16,7 +16,6 @@ using NSwag.Annotations;
 namespace CDRSandbox.Controllers;
 
 [ApiController]
-[DisableRequestSizeLimit]
 [Route("[controller]")]
 [OpenApiTag("Call detail record", Description = "Consumes CSV files into the database, fetch records and computes metrics")]
 public class CdrController(CdrService service) : ControllerBase
@@ -28,6 +27,7 @@ public class CdrController(CdrService service) : ControllerBase
         "Returns the number of records inserted in the database")]
     [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
     [OpenApiOperation("Upload CSV file", "Upload CSV file with the call detail record dataset to store them on the database")]
+    [DisableRequestSizeLimit]
     // Code was taken for MS sample https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/mvc/models/file-uploads/samples/5.x
     public async Task<IActionResult> UploadFile()
     {

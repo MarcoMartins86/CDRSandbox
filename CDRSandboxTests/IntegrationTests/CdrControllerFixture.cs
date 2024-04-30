@@ -47,6 +47,7 @@ public class CdrControllerFixture : TestServerBase
         await _clickHouse.StartAsync();
         // Init here so that GetClient() makes that TestServer initialize and FluentMigrator does the needed DB migrations
         _restClient = new RestClient(GetClient(), true);
+        Thread.Sleep(5000); // this is not the best approach, find another. Let's CH server process migration SQL
     }
 
     [OneTimeTearDown]

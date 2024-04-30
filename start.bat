@@ -1,0 +1,1 @@
+docker-compose up --build -d && start "" http://localhost:8080/swagger

@@ -57,8 +57,8 @@ public class CurrencyFixture : RandomDataGeneratorsBase
     public void Inequality()
     {
         // Arrange
-        var one = new Currency(RandomCurrency);
-        var two = new Currency(RandomCurrency);
+        var one = new Currency(Currency.ActiveCurrencyArray[0]);
+        var two = new Currency(Currency.ActiveCurrencyArray[1]);
         
         // Act
         // Assert
