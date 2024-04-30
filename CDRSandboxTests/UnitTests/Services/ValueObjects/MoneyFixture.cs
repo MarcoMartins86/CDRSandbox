@@ -59,8 +59,12 @@ public class MoneyFixture : RandomDataGeneratorsBase
     public void Inequality()
     {
         // Arrange
-        var one = new Money(RandomCost, RandomCurrency);
-        var two = new Money(RandomCost, RandomCurrency);
+        var firstRandCost = RandomCost;
+        var firstRandCurrency = RandomCurrency;
+        var one = new Money(firstRandCost, firstRandCurrency);
+        var secondRandCost = GenerateDistinctRandom(() => RandomCost, [firstRandCost]);
+        var secondRandCurrency = GenerateDistinctRandom(() => RandomCurrency, [firstRandCurrency]);
+        var two = new Money(secondRandCost, secondRandCurrency);
         
         // Act
         // Assert
@@ -72,9 +76,10 @@ public class MoneyFixture : RandomDataGeneratorsBase
     {
         // Arrange
         var cost = RandomCost;
-        // don't use random here since the data is so few that they will be equal a quite of times
-        var one = new Money(cost, Currency.ActiveCurrencyArray[0]);
-        var two = new Money(cost, Currency.ActiveCurrencyArray[1]);
+        var firstRand = RandomCurrency;
+        var one = new Money(cost, firstRand);
+        var secondRand = GenerateDistinctRandom(() => RandomCurrency, [firstRand]);
+        var two = new Money(cost, secondRand);
         
         // Act
         // Assert
@@ -86,8 +91,10 @@ public class MoneyFixture : RandomDataGeneratorsBase
     {
         // Arrange
         var currency = RandomCurrency;
-        var one = new Money(RandomCost, currency);
-        var two = new Money(RandomCost, currency);
+        var firstRand = RandomCost;
+        var one = new Money(firstRand, currency);
+        var secondRand = GenerateDistinctRandom(() => RandomCost, [firstRand]);
+        var two = new Money(secondRand, currency);
         
         // Act
         // Assert

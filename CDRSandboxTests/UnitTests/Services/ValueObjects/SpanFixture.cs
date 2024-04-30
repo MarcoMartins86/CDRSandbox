@@ -41,8 +41,10 @@ public class SpanFixture : RandomDataGeneratorsBase
     public void Inequality()
     {
         // Arrange
-        var one = new Span(RandomDuration);
-        var two = new Span(RandomDuration);
+        var firstRand = RandomDuration;
+        var one = new Span(firstRand);
+        var secondRand = GenerateDistinctRandom(() => RandomDuration, [firstRand]);
+        var two = new Span(secondRand);
         
         // Act
         // Assert

@@ -40,12 +40,12 @@ public class Date : ValueObject
     
     public DateOnly ToDateOnly() => Value;
     
-    public static bool operator ==(Date one, DateTime two)
+    public static bool operator ==(Date one, DateTime two) // TODO: override Equals to add logic
     {
         return one.Value == DateOnly.FromDateTime(two);
     }
     
-    public static bool operator !=(Date one, DateTime two)
+    public static bool operator !=(Date one, DateTime two) // TODO: override Equals to add logic
     {
         return one.Value != DateOnly.FromDateTime(two);
     }

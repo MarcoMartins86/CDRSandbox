@@ -57,8 +57,10 @@ public class PhoneFixture : RandomDataGeneratorsBase
     public void Inequality()
     {
         // Arrange
-        var one = new Phone(RandomPhoneNumber);
-        var two = new Phone(RandomPhoneNumber);
+        var firstRand = RandomPhoneNumber;
+        var one = new Phone(firstRand);
+        var secondRand = GenerateDistinctRandom(() => RandomPhoneNumber, [firstRand]);
+        var two = new Phone(secondRand);
         
         // Act
         // Assert

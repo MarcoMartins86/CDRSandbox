@@ -65,8 +65,10 @@ public class ReferenceFixture : RandomDataGeneratorsBase
     public void Inequality()
     {
         // Arrange
-        var one = new Reference(RandomReference);
-        var two = new Reference(RandomReference);
+        var firstRand = RandomReference;
+        var one = new Reference(firstRand);
+        var secondRand = GenerateDistinctRandom(() => RandomReference, [firstRand]);
+        var two = new Reference(secondRand);
         
         // Act
         // Assert

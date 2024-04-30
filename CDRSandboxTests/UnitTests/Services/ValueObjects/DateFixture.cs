@@ -95,8 +95,10 @@ public class DateFixture : RandomDataGeneratorsBase
     public void Inequality()
     {
         // Arrange
-        var one = new Date(RandomDateTime);
-        var two = new Date(RandomDateTime);
+        var firstRand = RandomDateTime;
+        var one = new Date(firstRand);
+        var secondRand = GenerateDistinctRandom(() => RandomDateTime, [firstRand]);
+        var two = new Date(secondRand);
         
         // Act
         // Assert
@@ -108,11 +110,12 @@ public class DateFixture : RandomDataGeneratorsBase
     {
         // Arrange
         var date = RandomDateTime;
-        var one = new Date(RandomDateTime);
+        var secondRand = GenerateDistinctRandom(() => RandomDateTime, [date]);
+        var two = new Date(secondRand);
         
         // Act
         // Assert
-        Assert.That(one != date, Is.True, "Must be different");
+        Assert.That(two != date, Is.True, "Must be different");
     }
     
     [Test]

@@ -139,4 +139,15 @@ public abstract class RandomDataGeneratorsBase
         string? endTime = null, uint? duration = null, float? cost = null, string? currency = null,
         string? reference = null, CdrCallTypeEnum? type = null) =>
         CdrItem2CdrCsvItem(RandomCdrItem(callerId, recipient, callDate, endTime, duration, cost, currency, reference, type));
+
+    protected T GenerateDistinctRandom<T>(Func<T> generator, T[] existentValues)
+    {
+        T newValue;
+
+        while (existentValues.Contains(newValue = generator()))
+        {
+        }
+
+        return newValue;
+    }
 }
